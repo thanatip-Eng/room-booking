@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจองห้อง - ภาควิชาวิศวกรรมคอมพิวเตอร์</title>
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ==================== CSS STYLES ==================== */
         * {
             margin: 0;
             padding: 0;
@@ -145,15 +142,6 @@
             cursor: pointer;
         }
         
-        .admin-badge {
-            background: var(--accent);
-            color: #000;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
         /* Main Content */
         .main-content {
             max-width: 1400px;
@@ -178,7 +166,7 @@
         /* Room Grid */
         .room-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.5rem;
         }
         
@@ -198,7 +186,7 @@
         
         .room-image {
             position: relative;
-            height: 180px;
+            height: 160px;
             overflow: hidden;
         }
         
@@ -225,18 +213,18 @@
             right: 1rem;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         
         .room-status {
             position: absolute;
             top: 1rem;
             left: 1rem;
-            padding: 0.35rem 0.75rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
         }
         
@@ -281,9 +269,9 @@
         
         .facility-tag {
             background: var(--bg-card);
-            padding: 0.3rem 0.6rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
         }
         
@@ -335,10 +323,6 @@
             color: white;
         }
         
-        .btn-danger:hover {
-            background: #DC2626;
-        }
-        
         .btn-success {
             background: var(--secondary);
             color: white;
@@ -347,6 +331,257 @@
         .btn-small {
             padding: 0.5rem 0.875rem;
             font-size: 0.8rem;
+        }
+        
+        /* Timeline View */
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .timeline-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .timeline-nav button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .timeline-nav button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .timeline-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .timeline-scroll {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+        
+        .timeline-grid {
+            display: grid;
+            min-width: 1200px;
+        }
+        
+        .timeline-header-row {
+            display: grid;
+            grid-template-columns: 150px repeat(28, 1fr);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 10;
+        }
+        
+        .timeline-corner {
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border);
+        }
+        
+        .timeline-hour {
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border);
+        }
+        
+        .timeline-hour.current {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .timeline-room-row {
+            display: grid;
+            grid-template-columns: 150px repeat(28, 1fr);
+            border-bottom: 1px solid var(--border);
+            min-height: 60px;
+        }
+        
+        .timeline-room-row:last-child {
+            border-bottom: none;
+        }
+        
+        .timeline-room-name {
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-right: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        
+        .timeline-room-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .timeline-room-info {
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .timeline-room-capacity {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        .timeline-cells {
+            display: contents;
+        }
+        
+        .timeline-cell {
+            border-right: 1px solid var(--border);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .timeline-cell:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .timeline-cell.current {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .timeline-booking {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 2px;
+            right: 2px;
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: white;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timeline-booking:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        
+        .timeline-legend {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.available {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px dashed var(--secondary);
+        }
+        
+        .legend-color.booked {
+            background: var(--primary);
+        }
+        
+        .legend-color.my-booking {
+            background: var(--accent);
+        }
+        
+        /* Quick Book Popup */
+        .quick-book-popup {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            min-width: 250px;
+            display: none;
+        }
+        
+        .quick-book-popup.show {
+            display: block;
+            animation: popIn 0.2s ease;
+        }
+        
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .quick-book-popup h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quick-book-popup p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .quick-book-popup .btn {
+            width: 100%;
         }
         
         /* Modal */
@@ -385,10 +620,6 @@
         
         .modal-overlay.active .modal {
             transform: scale(1);
-        }
-        
-        .modal.large {
-            max-width: 700px;
         }
         
         .modal-header {
@@ -462,21 +693,10 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-        }
-        
-        .form-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
         }
         
         .modal-footer {
@@ -487,72 +707,71 @@
             justify-content: flex-end;
         }
         
-        /* Calendar View */
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
+        /* Success Modal */
+        .success-modal .modal {
+            max-width: 400px;
+            text-align: center;
         }
         
-        .calendar-nav {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .calendar-nav button {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 1.25rem;
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+            animation: bounceIn 0.5s ease;
         }
         
-        .calendar-nav button:hover {
-            background: var(--primary);
-            border-color: var(--primary);
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         
-        .calendar-title {
+        .success-modal h2 {
             font-size: 1.5rem;
-            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
         }
         
-        .room-filter {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border);
-            background: transparent;
-            border-radius: 20px;
+        .success-modal p {
             color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
         }
         
-        .filter-btn.active {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: white;
+        .booking-summary {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: left;
+            margin-bottom: 1.5rem;
         }
         
-        /* Booking List */
+        .booking-summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        
+        .booking-summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .booking-summary-item span:first-child {
+            color: var(--text-muted);
+        }
+        
+        .booking-summary-item span:last-child {
+            font-weight: 500;
+        }
+        
+        /* My Bookings */
         .booking-list {
             display: flex;
             flex-direction: column;
@@ -574,7 +793,6 @@
         
         .booking-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
         }
         
         .booking-info {
@@ -621,164 +839,26 @@
             gap: 0.5rem;
         }
         
-        /* Admin Section */
-        .admin-section {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-        
-        .admin-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .admin-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        
-        .admin-header .count {
-            background: var(--bg-card);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-left: 0.5rem;
-        }
-        
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--bg-card);
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-        
-        .search-box input {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.9rem;
-            width: 150px;
-        }
-        
-        .search-box input:focus {
-            outline: none;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th,
-        .data-table td {
-            padding: 1rem 1.5rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .data-table th {
-            background: var(--bg-card);
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-        
-        .data-table tr:hover td {
-            background: rgba(99, 102, 241, 0.05);
-        }
-        
-        .status-active {
-            color: var(--secondary);
-        }
-        
-        .status-inactive {
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
             color: var(--text-muted);
         }
         
-        .table-actions {
-            display: flex;
-            gap: 0.5rem;
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
         
-        .room-preview {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
         }
         
-        .room-preview img {
-            width: 50px;
-            height: 35px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-        
-        .color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        /* Checkbox Group */
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--bg-card);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        
-        .checkbox-item:hover {
-            border-color: var(--primary);
-        }
-        
-        .checkbox-item.checked {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: var(--primary);
-        }
-        
-        .checkbox-item input {
-            width: auto;
-        }
-        
-        .checkbox-item span {
-            font-size: 0.85rem;
-        }
-        
-        .image-preview {
-            width: 100%;
-            height: 120px;
-            border-radius: 12px;
-            object-fit: cover;
-            margin-top: 0.5rem;
-            border: 1px solid var(--border);
-        }
-        
-        /* Signage Display */
+        /* Signage */
         .signage-container {
             min-height: 100vh;
             padding: 2rem;
@@ -858,13 +938,8 @@
             font-weight: 700;
         }
         
-        .status-text.available {
-            color: var(--secondary);
-        }
-        
-        .status-text.occupied {
-            color: var(--danger);
-        }
+        .status-text.available { color: var(--secondary); }
+        .status-text.occupied { color: var(--danger); }
         
         .current-booking {
             margin-top: 1.5rem;
@@ -921,74 +996,10 @@
             color: var(--text-secondary);
         }
         
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-muted);
-        }
-        
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Alert */
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--secondary);
-            color: var(--secondary);
-        }
-        
-        .alert-warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-        }
-        
-        .alert-info {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        /* Settings Section */
-        .settings-card {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
-        
-        .settings-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .settings-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
+        /* Hide for signage mode */
+        body.signage-mode .header,
+        body.signage-mode .main-content {
+            display: none;
         }
         
         /* Responsive */
@@ -1003,6 +1014,10 @@
             
             .form-row {
                 grid-template-columns: 1fr;
+            }
+            
+            .timeline-scroll {
+                padding: 0.5rem;
             }
             
             .signage-header {
@@ -1021,21 +1036,6 @@
             .signage-time {
                 font-size: 2.5rem;
             }
-            
-            .calendar-header {
-                flex-direction: column;
-            }
-            
-            .data-table {
-                display: block;
-                overflow-x: auto;
-            }
-        }
-        
-        /* Hide content for signage mode */
-        body.signage-mode .header,
-        body.signage-mode .main-content {
-            display: none;
         }
     </style>
 </head>
@@ -1053,17 +1053,13 @@
             
             <nav class="nav-tabs">
                 <button class="nav-tab active" data-tab="rooms">🚪 ห้องทั้งหมด</button>
-                <button class="nav-tab" data-tab="calendar">📅 ปฏิทิน</button>
+                <button class="nav-tab" data-tab="timeline">📊 ตารางเวลา</button>
                 <button class="nav-tab" data-tab="my-bookings">📋 การจองของฉัน</button>
-                <button class="nav-tab" data-tab="admin-rooms" id="adminRoomsTab" style="display:none;">⚙️ จัดการห้อง</button>
-                <button class="nav-tab" data-tab="admin-users" id="adminUsersTab" style="display:none;">👥 จัดการผู้ใช้</button>
-                <button class="nav-tab" data-tab="settings">🔧 ตั้งค่า</button>
             </nav>
             
             <div class="user-section">
                 <span style="font-size: 0.85rem; color: var(--text-muted);">เข้าใช้งานเป็น:</span>
                 <select id="currentUserSelect"></select>
-                <span class="admin-badge" id="adminBadge" style="display:none;">Admin</span>
             </div>
         </div>
     </header>
@@ -1075,125 +1071,54 @@
             <div class="room-grid" id="roomGrid"></div>
         </div>
         
-        <!-- Calendar Tab -->
-        <div class="tab-content" id="calendar-tab">
-            <div class="calendar-header">
-                <div class="calendar-nav">
+        <!-- Timeline Tab -->
+        <div class="tab-content" id="timeline-tab">
+            <div class="timeline-header">
+                <div class="timeline-nav">
                     <button onclick="changeDate(-1)">←</button>
-                    <h2 class="calendar-title" id="calendarTitle"></h2>
+                    <h2 class="timeline-title" id="timelineTitle"></h2>
                     <button onclick="changeDate(1)">→</button>
                     <button class="btn btn-secondary btn-small" onclick="goToToday()">วันนี้</button>
                 </div>
-                <div class="room-filter" id="roomFilter"></div>
             </div>
-            <div class="booking-list" id="calendarBookings"></div>
+            
+            <div class="timeline-container">
+                <div class="timeline-scroll">
+                    <div class="timeline-grid" id="timelineGrid"></div>
+                </div>
+                <div class="timeline-legend">
+                    <div class="legend-item">
+                        <div class="legend-color available"></div>
+                        <span>ว่าง (คลิกเพื่อจอง)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color booked"></div>
+                        <span>มีการจอง</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color my-booking"></div>
+                        <span>การจองของฉัน</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- My Bookings Tab -->
         <div class="tab-content" id="my-bookings-tab">
-            <h2 style="margin-bottom: 1.5rem;">📋 <span id="myBookingsTitle">การจองของฉัน</span></h2>
+            <h2 style="margin-bottom: 1.5rem;">📋 การจองของฉัน</h2>
             <div class="booking-list" id="myBookingsList"></div>
-        </div>
-        
-        <!-- Admin Rooms Tab -->
-        <div class="tab-content" id="admin-rooms-tab">
-            <div class="admin-section">
-                <div class="admin-header">
-                    <h2>🚪 จัดการห้อง <span class="count" id="roomCount">0</span></h2>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <div class="search-box">
-                            <span>🔍</span>
-                            <input type="text" placeholder="ค้นหาห้อง..." id="roomSearch" oninput="renderAdminRooms()">
-                        </div>
-                        <button class="btn btn-primary" onclick="openRoomModal()">➕ เพิ่มห้องใหม่</button>
-                    </div>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ห้อง</th>
-                            <th>ที่ตั้ง</th>
-                            <th>ความจุ</th>
-                            <th>อุปกรณ์</th>
-                            <th>สถานะ</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminRoomsTable"></tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Admin Users Tab -->
-        <div class="tab-content" id="admin-users-tab">
-            <div class="admin-section">
-                <div class="admin-header">
-                    <h2>👥 จัดการผู้ใช้ <span class="count" id="userCount">0</span></h2>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <div class="search-box">
-                            <span>🔍</span>
-                            <input type="text" placeholder="ค้นหาผู้ใช้..." id="userSearch" oninput="renderAdminUsers()">
-                        </div>
-                        <button class="btn btn-primary" onclick="openUserModal()">➕ เพิ่มผู้ใช้ใหม่</button>
-                    </div>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th>Email</th>
-                            <th>บทบาท</th>
-                            <th>สถานะ</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminUsersTable"></tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
-            <h2 style="margin-bottom: 1.5rem;">🔧 ตั้งค่าระบบ</h2>
-            
-            <div class="settings-card">
-                <h3>📅 Teamup Calendar</h3>
-                <p>เชื่อมต่อกับ Teamup Calendar เพื่อ sync การจองไปยังปฏิทินของภาควิชา</p>
-                
-                <div class="form-group">
-                    <label>Teamup API Key</label>
-                    <input type="text" id="teamupApiKey" placeholder="ใส่ API Key จาก teamup.com/api-keys/request">
-                    <p class="form-hint">ขอ API Key ได้ที่ <a href="https://teamup.com/api-keys/request" target="_blank" style="color: var(--primary);">teamup.com/api-keys/request</a></p>
-                </div>
-                
-                <div class="form-group">
-                    <label>Teamup Calendar ID</label>
-                    <input type="text" id="teamupCalendarId" placeholder="เช่น ks1234567890abcdef">
-                    <p class="form-hint">หา Calendar ID จาก Shareable Link ของ Teamup Calendar</p>
-                </div>
-                
-                <button class="btn btn-primary" onclick="saveTeamupSettings()">💾 บันทึกการตั้งค่า</button>
-                <button class="btn btn-secondary" onclick="testTeamupConnection()" style="margin-left: 0.5rem;">🔌 ทดสอบการเชื่อมต่อ</button>
-            </div>
-            
-            <div class="settings-card">
-                <h3>📤 Export/Import ข้อมูล</h3>
-                <p>สำรองหรือกู้คืนข้อมูลระบบ</p>
-                <button class="btn btn-secondary" onclick="exportData()">📥 Export ข้อมูลทั้งหมด</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" style="margin-left: 0.5rem;">📤 Import ข้อมูล</button>
-                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
-            </div>
-            
-            <div class="settings-card">
-                <h3>🗑️ ล้างข้อมูล</h3>
-                <p>ลบข้อมูลทั้งหมดและเริ่มต้นใหม่ (ระวัง! ไม่สามารถกู้คืนได้)</p>
-                <button class="btn btn-danger" onclick="resetAllData()">🗑️ ล้างข้อมูลทั้งหมด</button>
-            </div>
         </div>
     </main>
     
-    <!-- Signage Display (hidden by default) -->
+    <!-- Signage Display -->
     <div class="signage-container" id="signageDisplay" style="display:none;"></div>
+    
+    <!-- Quick Book Popup -->
+    <div class="quick-book-popup" id="quickBookPopup">
+        <h4 id="quickBookRoom"></h4>
+        <p id="quickBookTime"></p>
+        <button class="btn btn-primary" onclick="confirmQuickBook()">📅 จองเลย</button>
+    </div>
     
     <!-- Booking Modal -->
     <div class="modal-overlay" id="bookingModal">
@@ -1237,132 +1162,36 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">ยกเลิก</button>
-                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                    <button type="submit" class="btn btn-primary">📅 ยืนยันการจอง</button>
                 </div>
             </form>
         </div>
     </div>
     
-    <!-- Room Modal -->
-    <div class="modal-overlay" id="roomModal">
-        <div class="modal large">
-            <div class="modal-header">
-                <h2 id="roomModalTitle">➕ เพิ่มห้องใหม่</h2>
-                <button class="modal-close" onclick="closeRoomModal()">×</button>
-            </div>
-            <form id="roomForm" onsubmit="saveRoom(event)">
-                <div class="modal-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>ชื่อห้อง (ภาษาไทย) *</label>
-                            <input type="text" id="roomName" placeholder="เช่น ห้องประชุม 1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>ชื่อห้อง (ภาษาอังกฤษ)</label>
-                            <input type="text" id="roomNameEn" placeholder="เช่น Meeting Room 1">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>จำนวนที่นั่ง *</label>
-                            <input type="number" id="roomCapacity" min="1" max="500" value="10" required>
-                        </div>
-                        <div class="form-group">
-                            <label>สีประจำห้อง</label>
-                            <input type="color" id="roomColor" value="#6366F1" style="height: 42px; cursor: pointer;">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>ที่ตั้ง *</label>
-                        <input type="text" id="roomLocation" placeholder="เช่น ชั้น 3 อาคารวิศวกรรมคอมพิวเตอร์" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>URL รูปภาพห้อง</label>
-                        <input type="url" id="roomImage" placeholder="https://..." oninput="previewRoomImage()">
-                        <img id="roomImagePreview" class="image-preview" style="display:none;">
-                        <p class="form-hint">แนะนำใช้รูปจาก <a href="https://unsplash.com" target="_blank" style="color: var(--primary);">Unsplash</a></p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>สิ่งอำนวยความสะดวก</label>
-                        <div class="checkbox-group" id="facilitiesCheckbox"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>สถานะ</label>
-                        <select id="roomStatus">
-                            <option value="active">เปิดใช้งาน</option>
-                            <option value="inactive">ปิดใช้งาน</option>
-                        </select>
-                    </div>
-                    
-                    <input type="hidden" id="roomId">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeRoomModal()">ยกเลิก</button>
-                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- User Modal -->
-    <div class="modal-overlay" id="userModal">
+    <!-- Success Modal -->
+    <div class="modal-overlay success-modal" id="successModal">
         <div class="modal">
-            <div class="modal-header">
-                <h2 id="userModalTitle">➕ เพิ่มผู้ใช้ใหม่</h2>
-                <button class="modal-close" onclick="closeUserModal()">×</button>
+            <div class="modal-body" style="padding: 2.5rem;">
+                <div class="success-icon">✓</div>
+                <h2>จองสำเร็จ!</h2>
+                <p>การจองห้องของคุณได้รับการยืนยันแล้ว</p>
+                
+                <div class="booking-summary" id="bookingSummary"></div>
+                
+                <button class="btn btn-primary" onclick="closeSuccessModal()" style="width: 100%;">
+                    ตกลง
+                </button>
             </div>
-            <form id="userForm" onsubmit="saveUser(event)">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>ชื่อ-นามสกุล *</label>
-                        <input type="text" id="userName" placeholder="เช่น อ.ดร.สมชาย ใจดี" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="userEmail" placeholder="example@cmu.ac.th" required>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>บทบาท *</label>
-                            <select id="userRole" required>
-                                <option value="user">User (ผู้ใช้ทั่วไป)</option>
-                                <option value="staff">Staff (เจ้าหน้าที่)</option>
-                                <option value="admin">Admin (ผู้ดูแลระบบ)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>สถานะ</label>
-                            <select id="userStatus">
-                                <option value="active">เปิดใช้งาน</option>
-                                <option value="inactive">ปิดใช้งาน</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" id="userId">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()">ยกเลิก</button>
-                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
-                </div>
-            </form>
         </div>
     </div>
 
     <script>
         // ==================== CONFIGURATION ====================
-        const FACILITIES_OPTIONS = [
-            'โปรเจคเตอร์', 'TV', 'Whiteboard', 'Video Conference', 'WiFi',
-            'ระบบเสียง', 'ไมค์ลอย', 'Live Streaming', 'คอมพิวเตอร์',
-            'เครื่องปริ้น', 'เครื่องปรับอากาศ'
-        ];
+        // 🔧 ตั้งค่า Teamup Calendar ที่นี่
+        const TEAMUP_CONFIG = {
+            API_KEY: '633ea517324fcd66017c2f5774ff682f1fc6408998462e06bf5f9e95b2181114',
+            CALENDAR_ID: 'ksbwygkzbudducs6m4'
+        };
         
         const INITIAL_ROOMS = [
             {
@@ -1414,9 +1243,8 @@
         const INITIAL_USERS = [
             { id: '1', name: 'อ.ดร.ธนาธิป ชังกอง', email: 'thanatip.c@cmu.ac.th', role: 'admin', isActive: true },
             { id: '2', name: 'อ.ดร.กรกฎ ใยบัวเทศ', email: 'korakot.y@cmu.ac.th', role: 'user', isActive: true },
-            { id: '3', name: 'เจ้าหน้าที่ - วิไล', email: 'wilai.s@cmu.ac.th', role: 'admin', isActive: true },
-            { id: '4', name: 'เจ้าหน้าที่ - สมชาย', email: 'somchai.k@cmu.ac.th', role: 'staff', isActive: true },
-            { id: '5', name: 'นักศึกษา - ป.โท', email: 'grad.master@cmu.ac.th', role: 'user', isActive: true },
+            { id: '3', name: 'เจ้าหน้าที่ - วิไล', email: 'wilai.s@cmu.ac.th', role: 'staff', isActive: true },
+            { id: '4', name: 'นักศึกษา - ป.โท', email: 'grad.master@cmu.ac.th', role: 'user', isActive: true },
         ];
         
         // ==================== STATE ====================
@@ -1425,8 +1253,7 @@
         let bookings = [];
         let currentUserId = null;
         let selectedDate = new Date();
-        let filterRoomId = 'all';
-        let teamupSettings = { apiKey: '', calendarId: '' };
+        let quickBookData = null;
         
         // ==================== UTILITIES ====================
         function generateId() {
@@ -1451,7 +1278,9 @@
         
         function formatDateTimeLocal(date) {
             const d = new Date(date);
-            return d.toISOString().slice(0, 16);
+            const offset = d.getTimezoneOffset();
+            const adjusted = new Date(d.getTime() - offset * 60000);
+            return adjusted.toISOString().slice(0, 16);
         }
         
         function addMinutes(date, minutes) {
@@ -1462,18 +1291,12 @@
             return users.find(u => u.id === currentUserId);
         }
         
-        function isAdmin() {
-            const user = getCurrentUser();
-            return user && user.role === 'admin';
-        }
-        
         // ==================== LOCAL STORAGE ====================
         function saveData() {
             localStorage.setItem('rb_rooms', JSON.stringify(rooms));
             localStorage.setItem('rb_users', JSON.stringify(users));
             localStorage.setItem('rb_bookings', JSON.stringify(bookings));
             localStorage.setItem('rb_currentUserId', currentUserId);
-            localStorage.setItem('rb_teamup', JSON.stringify(teamupSettings));
         }
         
         function loadData() {
@@ -1481,106 +1304,82 @@
             const savedUsers = localStorage.getItem('rb_users');
             const savedBookings = localStorage.getItem('rb_bookings');
             const savedUserId = localStorage.getItem('rb_currentUserId');
-            const savedTeamup = localStorage.getItem('rb_teamup');
             
             rooms = savedRooms ? JSON.parse(savedRooms) : INITIAL_ROOMS;
             users = savedUsers ? JSON.parse(savedUsers) : INITIAL_USERS;
             bookings = savedBookings ? JSON.parse(savedBookings) : [];
             currentUserId = savedUserId || users[0]?.id;
-            teamupSettings = savedTeamup ? JSON.parse(savedTeamup) : { apiKey: '', calendarId: '' };
         }
         
         // ==================== TEAMUP CALENDAR ====================
         async function syncToTeamup(booking, action = 'create') {
-            if (!teamupSettings.apiKey || !teamupSettings.calendarId) {
-                console.log('Teamup not configured');
+            if (!TEAMUP_CONFIG.API_KEY || !TEAMUP_CONFIG.CALENDAR_ID) {
+                console.log('Teamup not configured - skipping sync');
                 return null;
             }
             
             const room = rooms.find(r => r.id === booking.roomId);
-            const url = `https://api.teamup.com/${teamupSettings.calendarId}/events`;
+            const baseUrl = `https://api.teamup.com/${TEAMUP_CONFIG.CALENDAR_ID}/events`;
             
             try {
                 if (action === 'create') {
-                    const response = await fetch(url, {
+                    const response = await fetch(baseUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Teamup-Token': teamupSettings.apiKey,
+                            'Teamup-Token': TEAMUP_CONFIG.API_KEY,
                         },
                         body: JSON.stringify({
-                            title: `${room?.name || 'ห้อง'} - ${booking.bookedBy}`,
+                            title: `[${room?.name || 'ห้อง'}] ${booking.purpose || 'การจองห้อง'} - ${booking.bookedBy}`,
                             start_dt: new Date(booking.startTime).toISOString(),
                             end_dt: new Date(booking.endTime).toISOString(),
-                            notes: booking.purpose || '',
+                            notes: `ผู้จอง: ${booking.bookedBy}\nวัตถุประสงค์: ${booking.purpose || '-'}\nห้อง: ${room?.name}`,
                             who: booking.bookedBy,
                         }),
                     });
                     
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('Teamup sync success:', data);
                         return data.event?.id;
+                    } else {
+                        console.error('Teamup sync failed:', await response.text());
                     }
                 } else if (action === 'update' && booking.teamupId) {
-                    await fetch(`${url}/${booking.teamupId}`, {
+                    const response = await fetch(`${baseUrl}/${booking.teamupId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Teamup-Token': teamupSettings.apiKey,
+                            'Teamup-Token': TEAMUP_CONFIG.API_KEY,
                         },
                         body: JSON.stringify({
-                            title: `${room?.name || 'ห้อง'} - ${booking.bookedBy}`,
+                            title: `[${room?.name || 'ห้อง'}] ${booking.purpose || 'การจองห้อง'} - ${booking.bookedBy}`,
                             start_dt: new Date(booking.startTime).toISOString(),
                             end_dt: new Date(booking.endTime).toISOString(),
-                            notes: booking.purpose || '',
+                            notes: `ผู้จอง: ${booking.bookedBy}\nวัตถุประสงค์: ${booking.purpose || '-'}\nห้อง: ${room?.name}`,
                         }),
                     });
+                    
+                    if (response.ok) {
+                        console.log('Teamup update success');
+                    }
                 } else if (action === 'delete' && booking.teamupId) {
-                    await fetch(`${url}/${booking.teamupId}`, {
+                    const response = await fetch(`${baseUrl}/${booking.teamupId}`, {
                         method: 'DELETE',
                         headers: {
-                            'Teamup-Token': teamupSettings.apiKey,
+                            'Teamup-Token': TEAMUP_CONFIG.API_KEY,
                         },
                     });
+                    
+                    if (response.ok) {
+                        console.log('Teamup delete success');
+                    }
                 }
             } catch (error) {
                 console.error('Teamup sync error:', error);
             }
             
             return null;
-        }
-        
-        async function testTeamupConnection() {
-            const apiKey = document.getElementById('teamupApiKey').value;
-            const calendarId = document.getElementById('teamupCalendarId').value;
-            
-            if (!apiKey || !calendarId) {
-                alert('กรุณากรอก API Key และ Calendar ID');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`https://api.teamup.com/${calendarId}/events?startDate=2024-01-01&endDate=2024-01-02`, {
-                    headers: {
-                        'Teamup-Token': apiKey,
-                    },
-                });
-                
-                if (response.ok) {
-                    alert('✅ เชื่อมต่อ Teamup สำเร็จ!');
-                } else {
-                    alert('❌ ไม่สามารถเชื่อมต่อได้ กรุณาตรวจสอบ API Key และ Calendar ID');
-                }
-            } catch (error) {
-                alert('❌ เกิดข้อผิดพลาด: ' + error.message);
-            }
-        }
-        
-        function saveTeamupSettings() {
-            teamupSettings.apiKey = document.getElementById('teamupApiKey').value;
-            teamupSettings.calendarId = document.getElementById('teamupCalendarId').value;
-            saveData();
-            alert('✅ บันทึกการตั้งค่าสำเร็จ!');
         }
         
         // ==================== RENDERING ====================
@@ -1593,25 +1392,14 @@
             select.onchange = () => {
                 currentUserId = select.value;
                 saveData();
-                updateAdminUI();
                 renderAll();
             };
-            
-            updateAdminUI();
-        }
-        
-        function updateAdminUI() {
-            const admin = isAdmin();
-            document.getElementById('adminBadge').style.display = admin ? 'inline' : 'none';
-            document.getElementById('adminRoomsTab').style.display = admin ? 'inline' : 'none';
-            document.getElementById('adminUsersTab').style.display = admin ? 'inline' : 'none';
-            document.getElementById('myBookingsTitle').textContent = admin ? 'การจองทั้งหมด (Admin)' : 'การจองของฉัน';
         }
         
         function renderRoomGrid() {
             const grid = document.getElementById('roomGrid');
             const now = new Date();
-            const activeRooms = isAdmin() ? rooms : rooms.filter(r => r.isActive);
+            const activeRooms = rooms.filter(r => r.isActive);
             
             grid.innerHTML = activeRooms.map(room => {
                 const currentBooking = bookings.find(b => {
@@ -1620,16 +1408,16 @@
                     return b.roomId === room.id && now >= start && now < end;
                 });
                 
-                const isAvailable = !currentBooking && room.isActive;
+                const isAvailable = !currentBooking;
                 
                 return `
-                    <div class="room-card ${!room.isActive ? 'inactive' : ''}">
+                    <div class="room-card">
                         <div class="room-image">
                             <img src="${room.image}" alt="${room.name}" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop'">
                             <div class="room-image-overlay"></div>
                             <div class="room-capacity">👥 ${room.capacity} ที่นั่ง</div>
-                            <div class="room-status ${!room.isActive ? 'occupied' : isAvailable ? 'available' : 'occupied'}">
-                                ${!room.isActive ? 'ปิดใช้งาน' : isAvailable ? 'ว่าง' : 'ไม่ว่าง'}
+                            <div class="room-status ${isAvailable ? 'available' : 'occupied'}">
+                                ${isAvailable ? 'ว่าง' : 'ไม่ว่าง'}
                             </div>
                         </div>
                         <div class="room-content">
@@ -1638,7 +1426,7 @@
                                     <div class="room-name">${room.name}</div>
                                     <div class="room-name-en">${room.nameEn || ''}</div>
                                 </div>
-                                <div class="color-dot" style="background-color: ${room.color};"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: ${room.color};"></div>
                             </div>
                             <div class="room-location">📍 ${room.location}</div>
                             <div class="room-facilities">
@@ -1646,7 +1434,7 @@
                                 ${room.facilities.length > 4 ? `<span class="facility-tag">+${room.facilities.length - 4}</span>` : ''}
                             </div>
                             <div class="room-actions">
-                                <button class="btn btn-primary" onclick="openBookingModal('${room.id}')" ${!room.isActive ? 'disabled' : ''}>
+                                <button class="btn btn-primary" onclick="openBookingModal('${room.id}')">
                                     📅 จองห้อง
                                 </button>
                                 <button class="btn btn-secondary" onclick="openSignage('${room.id}')">🖥️</button>
@@ -1657,81 +1445,108 @@
             }).join('');
         }
         
-        function renderCalendar() {
-            document.getElementById('calendarTitle').textContent = formatDate(selectedDate);
+        function renderTimeline() {
+            document.getElementById('timelineTitle').textContent = formatDate(selectedDate);
             
-            // Render room filter
-            const filterDiv = document.getElementById('roomFilter');
+            const grid = document.getElementById('timelineGrid');
+            const now = new Date();
+            const currentHour = now.getHours();
+            const isToday = selectedDate.toDateString() === now.toDateString();
+            
             const activeRooms = rooms.filter(r => r.isActive);
-            filterDiv.innerHTML = `
-                <button class="filter-btn ${filterRoomId === 'all' ? 'active' : ''}" onclick="setRoomFilter('all')">ทั้งหมด</button>
-                ${activeRooms.map(room => `
-                    <button class="filter-btn ${filterRoomId === room.id ? 'active' : ''}" 
-                            onclick="setRoomFilter('${room.id}')"
-                            style="${filterRoomId === room.id ? `background: ${room.color}; border-color: ${room.color};` : ''}">
-                        ${room.name}
-                    </button>
-                `).join('')}
-            `;
-            
-            // Render bookings
-            const dateStr = selectedDate.toDateString();
-            const dayBookings = bookings
-                .filter(b => new Date(b.startTime).toDateString() === dateStr)
-                .filter(b => filterRoomId === 'all' || b.roomId === filterRoomId)
-                .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-            
-            const listDiv = document.getElementById('calendarBookings');
-            
-            if (dayBookings.length === 0) {
-                listDiv.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📅</div>
-                        <h3>ไม่มีการจองในวันนี้</h3>
-                        <p>คลิกที่ห้องเพื่อเริ่มจอง</p>
-                    </div>
-                `;
-            } else {
-                listDiv.innerHTML = dayBookings.map(b => renderBookingCard(b)).join('');
+            const hours = [];
+            for (let h = 7; h <= 20; h++) {
+                hours.push({ hour: h, half: 0 });
+                hours.push({ hour: h, half: 30 });
             }
-        }
-        
-        function renderBookingCard(booking) {
-            const room = rooms.find(r => r.id === booking.roomId);
-            const start = new Date(booking.startTime);
-            const end = new Date(booking.endTime);
-            const durationMins = (end - start) / 60000;
-            const canModify = isAdmin() || booking.bookedById === currentUserId;
             
-            return `
-                <div class="booking-card">
-                    <div class="booking-info">
-                        <div class="booking-color" style="background-color: ${room?.color || '#6366F1'};"></div>
-                        <div class="booking-details">
-                            <h4>${room?.name || booking.roomName}</h4>
-                            <p>${booking.bookedBy}</p>
-                            ${booking.purpose ? `<p style="opacity: 0.7;">${booking.purpose}</p>` : ''}
+            // Header row
+            let headerHtml = `
+                <div class="timeline-header-row">
+                    <div class="timeline-corner">ห้อง / เวลา</div>
+                    ${hours.map(h => `
+                        <div class="timeline-hour ${isToday && h.hour === currentHour ? 'current' : ''}">
+                            ${h.half === 0 ? h.hour + ':00' : ''}
                         </div>
-                    </div>
-                    <div class="booking-time">
-                        <div class="time">${formatTime(start)} - ${formatTime(end)}</div>
-                        <div class="duration">${durationMins >= 60 ? `${durationMins / 60} ชม.` : `${durationMins} นาที`}</div>
-                    </div>
-                    ${canModify ? `
-                        <div class="booking-actions">
-                            <button class="btn btn-secondary btn-small" onclick="editBooking('${booking.id}')">✏️</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteBooking('${booking.id}')">🗑️</button>
-                        </div>
-                    ` : ''}
+                    `).join('')}
                 </div>
             `;
+            
+            // Room rows
+            let rowsHtml = activeRooms.map(room => {
+                const roomBookings = bookings.filter(b => {
+                    const bDate = new Date(b.startTime).toDateString();
+                    return b.roomId === room.id && bDate === selectedDate.toDateString();
+                });
+                
+                let cellsHtml = hours.map((h, idx) => {
+                    const cellTime = new Date(selectedDate);
+                    cellTime.setHours(h.hour, h.half, 0, 0);
+                    
+                    const isCurrent = isToday && h.hour === currentHour && 
+                        ((h.half === 0 && now.getMinutes() < 30) || (h.half === 30 && now.getMinutes() >= 30));
+                    
+                    // Check if there's a booking at this time
+                    const booking = roomBookings.find(b => {
+                        const start = new Date(b.startTime);
+                        const end = new Date(b.endTime);
+                        return cellTime >= start && cellTime < end;
+                    });
+                    
+                    // Check if this is the start of a booking
+                    const isBookingStart = roomBookings.find(b => {
+                        const start = new Date(b.startTime);
+                        return start.getHours() === h.hour && start.getMinutes() === h.half;
+                    });
+                    
+                    let bookingHtml = '';
+                    if (isBookingStart) {
+                        const duration = (new Date(isBookingStart.endTime) - new Date(isBookingStart.startTime)) / 60000;
+                        const spans = Math.ceil(duration / 30);
+                        const isMyBooking = isBookingStart.bookedById === currentUserId;
+                        
+                        bookingHtml = `
+                            <div class="timeline-booking" 
+                                 style="width: calc(${spans * 100}% + ${(spans - 1) * 1}px); background: ${isMyBooking ? 'var(--accent)' : room.color};"
+                                 onclick="event.stopPropagation(); ${isMyBooking ? `editBooking('${isBookingStart.id}')` : ''}"
+                                 title="${isBookingStart.bookedBy}: ${isBookingStart.purpose || 'การจองห้อง'}">
+                                ${isBookingStart.bookedBy.split(' ').pop()}
+                            </div>
+                        `;
+                    }
+                    
+                    const isPast = cellTime < now;
+                    
+                    return `
+                        <div class="timeline-cell ${isCurrent ? 'current' : ''}" 
+                             onclick="${!booking && !isPast ? `showQuickBook('${room.id}', '${cellTime.toISOString()}', event)` : ''}"
+                             style="${booking ? 'cursor: default;' : ''} ${isPast ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                            ${bookingHtml}
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="timeline-room-row">
+                        <div class="timeline-room-name">
+                            <div class="timeline-room-color" style="background: ${room.color};"></div>
+                            <div>
+                                <div class="timeline-room-info">${room.name}</div>
+                                <div class="timeline-room-capacity">👥 ${room.capacity}</div>
+                            </div>
+                        </div>
+                        <div class="timeline-cells">${cellsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            grid.innerHTML = headerHtml + rowsHtml;
         }
         
         function renderMyBookings() {
-            const admin = isAdmin();
             const now = new Date();
             const myBookings = bookings
-                .filter(b => admin || b.bookedById === currentUserId)
+                .filter(b => b.bookedById === currentUserId)
                 .filter(b => new Date(b.endTime) >= now)
                 .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
             
@@ -1742,116 +1557,48 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
                         <h3>ยังไม่มีการจอง</h3>
-                        <p>ไปที่แท็บ "ห้องทั้งหมด" เพื่อเริ่มจองห้อง</p>
+                        <p>ไปที่แท็บ "ตารางเวลา" เพื่อดูห้องว่างและจอง</p>
                     </div>
                 `;
             } else {
                 let lastDate = '';
                 listDiv.innerHTML = myBookings.map(b => {
+                    const room = rooms.find(r => r.id === b.roomId);
                     const dateStr = formatDate(b.startTime);
-                    const dateHeader = dateStr !== lastDate ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin: 1rem 0 0.5rem 0.5rem;">${dateStr}</div>` : '';
+                    const dateHeader = dateStr !== lastDate ? `<div style="font-size: 0.85rem; color: var(--text-muted); margin: 1.5rem 0 0.75rem 0.5rem; font-weight: 500;">${dateStr}</div>` : '';
                     lastDate = dateStr;
-                    return dateHeader + renderBookingCard(b);
+                    
+                    const start = new Date(b.startTime);
+                    const end = new Date(b.endTime);
+                    const durationMins = (end - start) / 60000;
+                    
+                    return dateHeader + `
+                        <div class="booking-card">
+                            <div class="booking-info">
+                                <div class="booking-color" style="background: ${room?.color || '#6366F1'};"></div>
+                                <div class="booking-details">
+                                    <h4>${room?.name || b.roomName}</h4>
+                                    <p>${b.purpose || 'การจองห้อง'}</p>
+                                </div>
+                            </div>
+                            <div class="booking-time">
+                                <div class="time">${formatTime(start)} - ${formatTime(end)}</div>
+                                <div class="duration">${durationMins >= 60 ? `${durationMins / 60} ชม.` : `${durationMins} นาที`}</div>
+                            </div>
+                            <div class="booking-actions">
+                                <button class="btn btn-secondary btn-small" onclick="editBooking('${b.id}')">✏️</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteBooking('${b.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
                 }).join('');
             }
         }
         
-        function renderAdminRooms() {
-            const search = document.getElementById('roomSearch').value.toLowerCase();
-            const filtered = rooms.filter(r => 
-                r.name.toLowerCase().includes(search) || 
-                (r.nameEn && r.nameEn.toLowerCase().includes(search))
-            );
-            
-            document.getElementById('roomCount').textContent = rooms.length + ' ห้อง';
-            
-            document.getElementById('adminRoomsTable').innerHTML = filtered.map(room => `
-                <tr>
-                    <td>
-                        <div class="room-preview">
-                            <img src="${room.image}" alt="${room.name}" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop'">
-                            <div class="color-dot" style="background-color: ${room.color};"></div>
-                            <div>
-                                <strong>${room.name}</strong><br>
-                                <small style="color: var(--text-muted);">${room.nameEn || ''}</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${room.location}</td>
-                    <td>${room.capacity} ที่นั่ง</td>
-                    <td>
-                        ${room.facilities.slice(0, 2).map(f => `<span class="facility-tag">${f}</span>`).join('')}
-                        ${room.facilities.length > 2 ? `<span class="facility-tag">+${room.facilities.length - 2}</span>` : ''}
-                    </td>
-                    <td class="${room.isActive ? 'status-active' : 'status-inactive'}">
-                        ${room.isActive ? '● เปิดใช้งาน' : '○ ปิดใช้งาน'}
-                    </td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="btn btn-secondary btn-small" onclick="editRoom('${room.id}')">✏️</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteRoom('${room.id}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function renderAdminUsers() {
-            const search = document.getElementById('userSearch').value.toLowerCase();
-            const filtered = users.filter(u => 
-                u.name.toLowerCase().includes(search) || 
-                u.email.toLowerCase().includes(search)
-            );
-            
-            document.getElementById('userCount').textContent = users.length + ' คน';
-            
-            document.getElementById('adminUsersTable').innerHTML = filtered.map(user => `
-                <tr>
-                    <td><strong>${user.name}</strong></td>
-                    <td>${user.email}</td>
-                    <td>
-                        <span class="admin-badge" style="background: ${
-                            user.role === 'admin' ? 'rgba(245, 158, 11, 0.2); color: var(--accent)' :
-                            user.role === 'staff' ? 'rgba(16, 185, 129, 0.2); color: var(--secondary)' :
-                            'rgba(99, 102, 241, 0.2); color: var(--primary)'
-                        }">
-                            ${user.role === 'admin' ? 'Admin' : user.role === 'staff' ? 'Staff' : 'User'}
-                        </span>
-                    </td>
-                    <td class="${user.isActive ? 'status-active' : 'status-inactive'}">
-                        ${user.isActive ? '● เปิดใช้งาน' : '○ ปิดใช้งาน'}
-                    </td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="btn btn-secondary btn-small" onclick="editUser('${user.id}')">✏️</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteUser('${user.id}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function renderSettings() {
-            document.getElementById('teamupApiKey').value = teamupSettings.apiKey || '';
-            document.getElementById('teamupCalendarId').value = teamupSettings.calendarId || '';
-        }
-        
-        function renderFacilitiesCheckbox() {
-            document.getElementById('facilitiesCheckbox').innerHTML = FACILITIES_OPTIONS.map(f => `
-                <label class="checkbox-item" id="facility-${f.replace(/\s/g, '-')}">
-                    <input type="checkbox" value="${f}" onchange="toggleFacility(this)">
-                    <span>${f}</span>
-                </label>
-            `).join('');
-        }
-        
         function renderAll() {
             renderRoomGrid();
-            renderCalendar();
+            renderTimeline();
             renderMyBookings();
-            renderAdminRooms();
-            renderAdminUsers();
-            renderSettings();
         }
         
         // ==================== TAB NAVIGATION ====================
@@ -1867,24 +1614,52 @@
             });
         }
         
-        // ==================== CALENDAR NAVIGATION ====================
+        // ==================== TIMELINE NAVIGATION ====================
         function changeDate(days) {
             selectedDate = new Date(selectedDate.setDate(selectedDate.getDate() + days));
-            renderCalendar();
+            renderTimeline();
         }
         
         function goToToday() {
             selectedDate = new Date();
-            renderCalendar();
+            renderTimeline();
         }
         
-        function setRoomFilter(roomId) {
-            filterRoomId = roomId;
-            renderCalendar();
+        // ==================== QUICK BOOK ====================
+        function showQuickBook(roomId, timeStr, event) {
+            const room = rooms.find(r => r.id === roomId);
+            const time = new Date(timeStr);
+            
+            quickBookData = { roomId, time };
+            
+            const popup = document.getElementById('quickBookPopup');
+            document.getElementById('quickBookRoom').textContent = room.name;
+            document.getElementById('quickBookTime').textContent = `${formatTime(time)} - ${formatTime(addMinutes(time, 60))}`;
+            
+            popup.style.left = Math.min(event.pageX, window.innerWidth - 280) + 'px';
+            popup.style.top = Math.min(event.pageY, window.innerHeight - 150) + 'px';
+            popup.classList.add('show');
+            
+            // Close on click outside
+            setTimeout(() => {
+                document.addEventListener('click', closeQuickBook);
+            }, 100);
+        }
+        
+        function closeQuickBook() {
+            document.getElementById('quickBookPopup').classList.remove('show');
+            document.removeEventListener('click', closeQuickBook);
+        }
+        
+        function confirmQuickBook() {
+            if (quickBookData) {
+                openBookingModal(quickBookData.roomId, null, quickBookData.time);
+            }
+            closeQuickBook();
         }
         
         // ==================== BOOKING MODAL ====================
-        function openBookingModal(roomId, bookingId = null) {
+        function openBookingModal(roomId, bookingId = null, presetTime = null) {
             const modal = document.getElementById('bookingModal');
             const room = rooms.find(r => r.id === roomId);
             
@@ -1895,7 +1670,6 @@
             ).join('');
             
             if (bookingId) {
-                // Edit mode
                 const booking = bookings.find(b => b.id === bookingId);
                 document.getElementById('bookingModalTitle').textContent = `✏️ แก้ไขการจอง - ${room?.name}`;
                 document.getElementById('bookingUser').value = booking.bookedById;
@@ -1904,10 +1678,9 @@
                 document.getElementById('bookingPurpose').value = booking.purpose || '';
                 document.getElementById('bookingId').value = bookingId;
             } else {
-                // Create mode
                 document.getElementById('bookingModalTitle').textContent = `📅 จองห้อง - ${room?.name}`;
                 document.getElementById('bookingUser').value = currentUserId;
-                document.getElementById('bookingStart').value = formatDateTimeLocal(new Date());
+                document.getElementById('bookingStart').value = formatDateTimeLocal(presetTime || new Date());
                 document.getElementById('bookingDuration').value = '60';
                 document.getElementById('bookingPurpose').value = '';
                 document.getElementById('bookingId').value = '';
@@ -1928,15 +1701,29 @@
             const roomId = document.getElementById('bookingRoomId').value;
             const userId = document.getElementById('bookingUser').value;
             const user = users.find(u => u.id === userId);
+            const room = rooms.find(r => r.id === roomId);
             const startTime = new Date(document.getElementById('bookingStart').value);
             const duration = parseInt(document.getElementById('bookingDuration').value);
             const endTime = addMinutes(startTime, duration);
             const purpose = document.getElementById('bookingPurpose').value;
             
+            // Check for conflicts
+            const hasConflict = bookings.some(b => {
+                if (b.id === id || b.roomId !== roomId) return false;
+                const bStart = new Date(b.startTime);
+                const bEnd = new Date(b.endTime);
+                return (startTime < bEnd && endTime > bStart);
+            });
+            
+            if (hasConflict) {
+                alert('❌ ช่วงเวลานี้มีการจองแล้ว กรุณาเลือกเวลาอื่น');
+                return;
+            }
+            
             const bookingData = {
                 id: id || generateId(),
                 roomId,
-                roomName: rooms.find(r => r.id === roomId)?.name,
+                roomName: room?.name,
                 bookedById: userId,
                 bookedBy: user?.name,
                 startTime: startTime.toISOString(),
@@ -1946,13 +1733,11 @@
             };
             
             if (id) {
-                // Update existing
                 const index = bookings.findIndex(b => b.id === id);
                 bookingData.teamupId = bookings[index].teamupId;
                 bookings[index] = bookingData;
                 await syncToTeamup(bookingData, 'update');
             } else {
-                // Create new
                 const teamupId = await syncToTeamup(bookingData, 'create');
                 bookingData.teamupId = teamupId;
                 bookings.push(bookingData);
@@ -1961,17 +1746,20 @@
             saveData();
             renderAll();
             closeBookingModal();
+            
+            // Show success modal
+            showSuccessModal(bookingData, room);
         }
         
         function editBooking(id) {
             const booking = bookings.find(b => b.id === id);
-            if (booking) {
+            if (booking && booking.bookedById === currentUserId) {
                 openBookingModal(booking.roomId, id);
             }
         }
         
         async function deleteBooking(id) {
-            if (confirm('ต้องการลบการจองนี้หรือไม่?')) {
+            if (confirm('ต้องการยกเลิกการจองนี้หรือไม่?')) {
                 const booking = bookings.find(b => b.id === id);
                 await syncToTeamup(booking, 'delete');
                 bookings = bookings.filter(b => b.id !== id);
@@ -1980,174 +1768,42 @@
             }
         }
         
-        // ==================== ROOM MODAL ====================
-        function openRoomModal(roomId = null) {
-            const modal = document.getElementById('roomModal');
-            renderFacilitiesCheckbox();
+        // ==================== SUCCESS MODAL ====================
+        function showSuccessModal(booking, room) {
+            const summaryDiv = document.getElementById('bookingSummary');
+            summaryDiv.innerHTML = `
+                <div class="booking-summary-item">
+                    <span>ห้อง</span>
+                    <span>${room?.name}</span>
+                </div>
+                <div class="booking-summary-item">
+                    <span>วันที่</span>
+                    <span>${formatDate(booking.startTime)}</span>
+                </div>
+                <div class="booking-summary-item">
+                    <span>เวลา</span>
+                    <span>${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}</span>
+                </div>
+                <div class="booking-summary-item">
+                    <span>ผู้จอง</span>
+                    <span>${booking.bookedBy}</span>
+                </div>
+                ${booking.purpose ? `
+                <div class="booking-summary-item">
+                    <span>วัตถุประสงค์</span>
+                    <span>${booking.purpose}</span>
+                </div>
+                ` : ''}
+            `;
             
-            if (roomId) {
-                const room = rooms.find(r => r.id === roomId);
-                document.getElementById('roomModalTitle').textContent = '✏️ แก้ไขข้อมูลห้อง';
-                document.getElementById('roomName').value = room.name;
-                document.getElementById('roomNameEn').value = room.nameEn || '';
-                document.getElementById('roomCapacity').value = room.capacity;
-                document.getElementById('roomColor').value = room.color;
-                document.getElementById('roomLocation').value = room.location;
-                document.getElementById('roomImage').value = room.image || '';
-                document.getElementById('roomStatus').value = room.isActive ? 'active' : 'inactive';
-                document.getElementById('roomId').value = roomId;
-                
-                // Set facilities
-                room.facilities.forEach(f => {
-                    const checkbox = document.querySelector(`#facility-${f.replace(/\s/g, '-')} input`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        checkbox.parentElement.classList.add('checked');
-                    }
-                });
-                
-                previewRoomImage();
-            } else {
-                document.getElementById('roomModalTitle').textContent = '➕ เพิ่มห้องใหม่';
-                document.getElementById('roomForm').reset();
-                document.getElementById('roomColor').value = '#6366F1';
-                document.getElementById('roomId').value = '';
-                document.getElementById('roomImagePreview').style.display = 'none';
-            }
-            
-            modal.classList.add('active');
+            document.getElementById('successModal').classList.add('active');
         }
         
-        function closeRoomModal() {
-            document.getElementById('roomModal').classList.remove('active');
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
         }
         
-        function toggleFacility(checkbox) {
-            checkbox.parentElement.classList.toggle('checked', checkbox.checked);
-        }
-        
-        function previewRoomImage() {
-            const url = document.getElementById('roomImage').value;
-            const preview = document.getElementById('roomImagePreview');
-            if (url) {
-                preview.src = url;
-                preview.style.display = 'block';
-            } else {
-                preview.style.display = 'none';
-            }
-        }
-        
-        function saveRoom(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('roomId').value;
-            const facilities = Array.from(document.querySelectorAll('#facilitiesCheckbox input:checked'))
-                .map(cb => cb.value);
-            
-            const roomData = {
-                id: id || generateId(),
-                name: document.getElementById('roomName').value,
-                nameEn: document.getElementById('roomNameEn').value,
-                capacity: parseInt(document.getElementById('roomCapacity').value),
-                color: document.getElementById('roomColor').value,
-                location: document.getElementById('roomLocation').value,
-                image: document.getElementById('roomImage').value || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
-                facilities,
-                isActive: document.getElementById('roomStatus').value === 'active',
-            };
-            
-            if (id) {
-                const index = rooms.findIndex(r => r.id === id);
-                rooms[index] = roomData;
-            } else {
-                rooms.push(roomData);
-            }
-            
-            saveData();
-            renderAll();
-            closeRoomModal();
-        }
-        
-        function editRoom(id) {
-            openRoomModal(id);
-        }
-        
-        function deleteRoom(id) {
-            const room = rooms.find(r => r.id === id);
-            if (confirm(`ต้องการลบห้อง "${room.name}" หรือไม่?\n\nการลบจะทำให้การจองที่เกี่ยวข้องถูกลบด้วย`)) {
-                rooms = rooms.filter(r => r.id !== id);
-                bookings = bookings.filter(b => b.roomId !== id);
-                saveData();
-                renderAll();
-            }
-        }
-        
-        // ==================== USER MODAL ====================
-        function openUserModal(userId = null) {
-            const modal = document.getElementById('userModal');
-            
-            if (userId) {
-                const user = users.find(u => u.id === userId);
-                document.getElementById('userModalTitle').textContent = '✏️ แก้ไขข้อมูลผู้ใช้';
-                document.getElementById('userName').value = user.name;
-                document.getElementById('userEmail').value = user.email;
-                document.getElementById('userRole').value = user.role;
-                document.getElementById('userStatus').value = user.isActive ? 'active' : 'inactive';
-                document.getElementById('userId').value = userId;
-            } else {
-                document.getElementById('userModalTitle').textContent = '➕ เพิ่มผู้ใช้ใหม่';
-                document.getElementById('userForm').reset();
-                document.getElementById('userId').value = '';
-            }
-            
-            modal.classList.add('active');
-        }
-        
-        function closeUserModal() {
-            document.getElementById('userModal').classList.remove('active');
-        }
-        
-        function saveUser(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('userId').value;
-            
-            const userData = {
-                id: id || generateId(),
-                name: document.getElementById('userName').value,
-                email: document.getElementById('userEmail').value,
-                role: document.getElementById('userRole').value,
-                isActive: document.getElementById('userStatus').value === 'active',
-            };
-            
-            if (id) {
-                const index = users.findIndex(u => u.id === id);
-                users[index] = userData;
-            } else {
-                users.push(userData);
-            }
-            
-            saveData();
-            renderUserSelect();
-            renderAll();
-            closeUserModal();
-        }
-        
-        function editUser(id) {
-            openUserModal(id);
-        }
-        
-        function deleteUser(id) {
-            const user = users.find(u => u.id === id);
-            if (confirm(`ต้องการลบผู้ใช้ "${user.name}" หรือไม่?`)) {
-                users = users.filter(u => u.id !== id);
-                saveData();
-                renderUserSelect();
-                renderAll();
-            }
-        }
-        
-        // ==================== SIGNAGE DISPLAY ====================
+        // ==================== SIGNAGE ====================
         function openSignage(roomId) {
             window.open(`${window.location.pathname}?display=${roomId}`, '_blank');
         }
@@ -2184,7 +1840,7 @@
                 
                 document.getElementById('signageDisplay').innerHTML = `
                     <div class="signage-header">
-                        <div class="signage-room-info">
+                        <div>
                             <div class="signage-room-name">${room.name}</div>
                             <div class="signage-location">📍 ${room.location} | 👥 ${room.capacity} ที่นั่ง</div>
                         </div>
@@ -2210,9 +1866,7 @@
                     <div class="upcoming-section">
                         <h3>📋 การจองที่กำลังจะมาถึง</h3>
                         ${upcomingBookings.length === 0 ? `
-                            <div class="empty-state" style="padding: 2rem;">
-                                <p>ไม่มีการจองในขณะนี้</p>
-                            </div>
+                            <div class="empty-state" style="padding: 2rem;"><p>ไม่มีการจองในขณะนี้</p></div>
                         ` : `
                             <div class="upcoming-list">
                                 ${upcomingBookings.map(b => `
@@ -2232,69 +1886,8 @@
             setInterval(updateSignage, 1000);
         }
         
-        // ==================== EXPORT/IMPORT ====================
-        function exportData() {
-            const data = {
-                rooms,
-                users,
-                bookings,
-                teamupSettings,
-                exportDate: new Date().toISOString(),
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `room-booking-backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (confirm('ต้องการนำเข้าข้อมูลนี้หรือไม่?\n\nข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด')) {
-                        rooms = data.rooms || [];
-                        users = data.users || [];
-                        bookings = data.bookings || [];
-                        teamupSettings = data.teamupSettings || { apiKey: '', calendarId: '' };
-                        
-                        if (users.length > 0 && !users.find(u => u.id === currentUserId)) {
-                            currentUserId = users[0].id;
-                        }
-                        
-                        saveData();
-                        renderUserSelect();
-                        renderAll();
-                        alert('✅ นำเข้าข้อมูลสำเร็จ!');
-                    }
-                } catch (error) {
-                    alert('❌ ไฟล์ไม่ถูกต้อง');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-        
-        function resetAllData() {
-            if (confirm('⚠️ คำเตือน!\n\nต้องการล้างข้อมูลทั้งหมดหรือไม่?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
-                if (confirm('คุณแน่ใจหรือไม่? ข้อมูลทั้งหมดจะหายไป')) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            }
-        }
-        
         // ==================== INITIALIZATION ====================
         function init() {
-            // Check for signage mode
             const urlParams = new URLSearchParams(window.location.search);
             const displayRoom = urlParams.get('display');
             
@@ -2309,7 +1902,6 @@
             }
         }
         
-        // Start the app
         init();
     </script>
 </body>
