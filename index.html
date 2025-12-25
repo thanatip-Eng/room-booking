@@ -1078,7 +1078,7 @@
                     <button onclick="changeDate(-1)">←</button>
                     <h2 class="timeline-title" id="timelineTitle"></h2>
                     <button onclick="changeDate(1)">→</button>
-                    <button class="btn btn-secondary btn-small" onclick="goToToday()">วันนี้</button>
+                    <button class="btn btn-secondary btn-small" onclick="goToToday()" style="white-space: nowrap;">วันนี้</button>
                 </div>
             </div>
             
@@ -1511,7 +1511,7 @@
                                  style="width: calc(${spans * 100}% + ${(spans - 1) * 1}px); background: ${isMyBooking ? 'var(--accent)' : room.color};"
                                  onclick="event.stopPropagation(); ${isMyBooking ? `editBooking('${isBookingStart.id}')` : ''}"
                                  title="${isBookingStart.bookedBy}: ${isBookingStart.purpose || 'การจองห้อง'}">
-                                ${isBookingStart.bookedBy.split(' ').pop()}
+                                ${isBookingStart.bookedBy.split(' ')[0]}
                             </div>
                         `;
                     }
@@ -1872,7 +1872,7 @@
                         
                         row += `<td class="booked-cell">
                             <div class="booking-info-print">
-                                <strong>${b.bookedBy?.split(' ').slice(-1)[0] || 'ไม่ระบุ'}</strong>
+                                <strong>${b.bookedBy?.split(' ')[0] || 'ไม่ระบุ'}</strong>
                                 <span class="booking-time-print">${timeStr}</span>
                                 ${b.purpose ? `<span class="booking-purpose">${b.purpose.substring(0, 20)}${b.purpose.length > 20 ? '...' : ''}</span>` : ''}
                             </div>
