@@ -16,18 +16,31 @@
         }
         
         :root {
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --danger: #EF4444;
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-card: #334155;
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
-            --border: #475569;
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #3730A3;
+            --secondary: #059669;
+            --secondary-light: #34D399;
+            --accent: #D97706;
+            --accent-light: #FBBF24;
+            --danger: #DC2626;
+            --danger-light: #F87171;
+            
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #FFFFFF;
+            --bg-card: #F1F5F9;
+            --bg-hover: #E2E8F0;
+            
+            --text-primary: #1E293B;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            
+            --border: #E2E8F0;
+            --border-dark: #CBD5E1;
+            
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
         
         body {
@@ -35,20 +48,17 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            background-image: 
-                radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom right, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
         }
         
         /* Header */
         .header {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
+            background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
             padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
         
         .header-content {
@@ -70,22 +80,19 @@
         .logo-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            box-shadow: var(--shadow);
         }
         
         .logo-text h1 {
             font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
         }
         
         .logo-text p {
@@ -116,13 +123,13 @@
         
         .nav-tab:hover {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-hover);
         }
         
         .nav-tab.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            box-shadow: var(--shadow);
         }
         
         .user-section {
@@ -135,11 +142,17 @@
             padding: 0.6rem 1rem;
             border: 1px solid var(--border);
             border-radius: 8px;
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             color: var(--text-primary);
             font-family: inherit;
             font-size: 0.9rem;
             cursor: pointer;
+        }
+        
+        .user-section select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
         
         /* Main Content */
@@ -163,30 +176,274 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Room Grid */
+        /* Section Title */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Timeline Section */
+        .timeline-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .timeline-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .timeline-nav button {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .timeline-nav button:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .timeline-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .timeline-scroll {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+        
+        .timeline-grid {
+            display: grid;
+            min-width: 1000px;
+        }
+        
+        .timeline-header-row {
+            display: grid;
+            grid-template-columns: 180px repeat(28, 1fr);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 10;
+        }
+        
+        .timeline-corner {
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+        
+        .timeline-hour {
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+        
+        .timeline-hour.current {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .timeline-room-row {
+            display: grid;
+            grid-template-columns: 180px repeat(28, 1fr);
+            border-bottom: 1px solid var(--border);
+            min-height: 55px;
+        }
+        
+        .timeline-room-row:last-child {
+            border-bottom: none;
+        }
+        
+        .timeline-room-name {
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-right: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        
+        .timeline-room-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .timeline-room-info {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .timeline-room-capacity {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        
+        .timeline-cells {
+            display: contents;
+        }
+        
+        .timeline-cell {
+            border-right: 1px solid var(--border);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            background: var(--bg-secondary);
+        }
+        
+        .timeline-cell:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+        
+        .timeline-cell.current {
+            background: rgba(79, 70, 229, 0.08);
+        }
+        
+        .timeline-cell.past {
+            background: var(--bg-card);
+            cursor: not-allowed;
+        }
+        
+        .timeline-booking {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 2px;
+            right: 2px;
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .timeline-booking:hover {
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+        
+        .timeline-legend {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            background: var(--bg-card);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.available {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--secondary);
+        }
+        
+        .legend-color.booked {
+            background: var(--primary);
+        }
+        
+        .legend-color.my-booking {
+            background: var(--accent);
+        }
+        
+        /* Room Grid Section */
+        .room-section {
+            margin-bottom: 2rem;
+        }
+        
         .room-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
         }
         
         .room-card {
             background: var(--bg-secondary);
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             border: 1px solid var(--border);
             transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
         
         .room-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
         }
         
         .room-image {
             position: relative;
-            height: 160px;
+            height: 140px;
             overflow: hidden;
         }
         
@@ -204,37 +461,39 @@
         .room-image-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 60%);
+            background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);
         }
         
         .room-capacity {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 0.4rem 0.8rem;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255,255,255,0.95);
+            padding: 0.3rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .room-status {
             position: absolute;
-            top: 1rem;
-            left: 1rem;
-            padding: 0.3rem 0.7rem;
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 600;
         }
         
         .room-status.available {
-            background: rgba(16, 185, 129, 0.9);
+            background: var(--secondary);
             color: white;
         }
         
         .room-status.occupied {
-            background: rgba(239, 68, 68, 0.9);
+            background: var(--danger);
             color: white;
         }
         
@@ -243,9 +502,10 @@
         }
         
         .room-name {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
         }
         
         .room-name-en {
@@ -269,10 +529,11 @@
         
         .facility-tag {
             background: var(--bg-card);
-            padding: 0.25rem 0.5rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 6px;
             font-size: 0.65rem;
             color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
         
         .room-actions {
@@ -282,9 +543,9 @@
         
         /* Buttons */
         .btn {
-            padding: 0.7rem 1.25rem;
+            padding: 0.6rem 1.1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-family: inherit;
             font-size: 0.85rem;
             font-weight: 500;
@@ -293,7 +554,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
         
         .btn-primary {
@@ -304,8 +565,8 @@
         
         .btn-primary:hover {
             background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
         }
         
         .btn-secondary {
@@ -315,12 +576,17 @@
         }
         
         .btn-secondary:hover {
-            background: var(--border);
+            background: var(--bg-hover);
+            border-color: var(--border-dark);
         }
         
         .btn-danger {
             background: var(--danger);
             color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #B91C1C;
         }
         
         .btn-success {
@@ -329,221 +595,8 @@
         }
         
         .btn-small {
-            padding: 0.5rem 0.875rem;
+            padding: 0.45rem 0.75rem;
             font-size: 0.8rem;
-        }
-        
-        /* Timeline View */
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .timeline-nav {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .timeline-nav button {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        
-        .timeline-nav button:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .timeline-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .timeline-container {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        
-        .timeline-scroll {
-            overflow-x: auto;
-            padding: 1rem;
-        }
-        
-        .timeline-grid {
-            display: grid;
-            min-width: 1200px;
-        }
-        
-        .timeline-header-row {
-            display: grid;
-            grid-template-columns: 150px repeat(28, 1fr);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: var(--bg-secondary);
-            z-index: 10;
-        }
-        
-        .timeline-corner {
-            padding: 0.75rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-right: 1px solid var(--border);
-        }
-        
-        .timeline-hour {
-            padding: 0.5rem 0.25rem;
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            border-right: 1px solid var(--border);
-        }
-        
-        .timeline-hour.current {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .timeline-room-row {
-            display: grid;
-            grid-template-columns: 150px repeat(28, 1fr);
-            border-bottom: 1px solid var(--border);
-            min-height: 60px;
-        }
-        
-        .timeline-room-row:last-child {
-            border-bottom: none;
-        }
-        
-        .timeline-room-name {
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-right: 1px solid var(--border);
-            background: var(--bg-card);
-            position: sticky;
-            left: 0;
-            z-index: 5;
-        }
-        
-        .timeline-room-color {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .timeline-room-info {
-            font-size: 0.8rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .timeline-room-capacity {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-        
-        .timeline-cells {
-            display: contents;
-        }
-        
-        .timeline-cell {
-            border-right: 1px solid var(--border);
-            position: relative;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        
-        .timeline-cell:hover {
-            background: rgba(99, 102, 241, 0.1);
-        }
-        
-        .timeline-cell.current {
-            background: rgba(99, 102, 241, 0.1);
-        }
-        
-        .timeline-booking {
-            position: absolute;
-            top: 4px;
-            bottom: 4px;
-            left: 2px;
-            right: 2px;
-            border-radius: 6px;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: white;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .timeline-booking:hover {
-            transform: scale(1.02);
-            z-index: 10;
-        }
-        
-        .timeline-legend {
-            display: flex;
-            gap: 1.5rem;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-        }
-        
-        .legend-color.available {
-            background: rgba(16, 185, 129, 0.3);
-            border: 2px dashed var(--secondary);
-        }
-        
-        .legend-color.booked {
-            background: var(--primary);
-        }
-        
-        .legend-color.my-booking {
-            background: var(--accent);
         }
         
         /* Quick Book Popup */
@@ -553,9 +606,9 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-lg);
             z-index: 200;
-            min-width: 250px;
+            min-width: 220px;
             display: none;
         }
         
@@ -571,13 +624,14 @@
         
         .quick-book-popup h4 {
             font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
         }
         
         .quick-book-popup p {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
         
         .quick-book-popup .btn {
@@ -588,8 +642,8 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -607,13 +661,13 @@
         
         .modal {
             background: var(--bg-secondary);
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-lg);
             transform: scale(0.9);
             transition: transform 0.3s ease;
         }
@@ -623,26 +677,28 @@
         }
         
         .modal-header {
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--bg-card);
         }
         
         .modal-header h2 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
+            color: var(--text-primary);
         }
         
         .modal-close {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border: none;
-            background: var(--bg-card);
-            border-radius: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
             color: var(--text-secondary);
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -656,7 +712,7 @@
         }
         
         .modal-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
         
         .form-group {
@@ -667,7 +723,7 @@
             display: block;
             font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             font-weight: 500;
         }
         
@@ -675,10 +731,10 @@
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 1rem;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-card);
+            border-radius: 8px;
+            background: var(--bg-secondary);
             color: var(--text-primary);
             font-family: inherit;
             font-size: 0.95rem;
@@ -690,7 +746,7 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
         
         .form-row {
@@ -700,30 +756,32 @@
         }
         
         .modal-footer {
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             justify-content: flex-end;
+            background: var(--bg-card);
         }
         
         /* Success Modal */
         .success-modal .modal {
-            max-width: 400px;
+            max-width: 380px;
             text-align: center;
         }
         
         .success-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            margin: 0 auto 1.25rem;
             animation: bounceIn 0.5s ease;
+            color: white;
         }
         
         @keyframes bounceIn {
@@ -733,30 +791,32 @@
         }
         
         .success-modal h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.4rem;
             color: var(--secondary);
         }
         
         .success-modal p {
             color: var(--text-secondary);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
         }
         
         .booking-summary {
             background: var(--bg-card);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1rem;
             text-align: left;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
         }
         
         .booking-summary-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
+            padding: 0.4rem 0;
             border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .booking-summary-item:last-child {
@@ -769,6 +829,7 @@
         
         .booking-summary-item span:last-child {
             font-weight: 500;
+            color: var(--text-primary);
         }
         
         /* My Bookings */
@@ -781,7 +842,7 @@
         .booking-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 1rem 1.25rem;
             display: flex;
             justify-content: space-between;
@@ -789,10 +850,12 @@
             transition: all 0.2s ease;
             flex-wrap: wrap;
             gap: 1rem;
+            box-shadow: var(--shadow-sm);
         }
         
         .booking-card:hover {
-            border-color: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow);
         }
         
         .booking-info {
@@ -804,14 +867,15 @@
         
         .booking-color {
             width: 4px;
-            height: 50px;
+            height: 45px;
             border-radius: 4px;
         }
         
         .booking-details h4 {
             font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
+            color: var(--text-primary);
         }
         
         .booking-details p {
@@ -824,7 +888,7 @@
         }
         
         .booking-time .time {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: var(--primary);
         }
@@ -842,19 +906,19 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 2rem;
             color: var(--text-muted);
         }
         
         .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
             opacity: 0.5;
         }
         
         .empty-state h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
             color: var(--text-secondary);
         }
         
@@ -864,6 +928,7 @@
             padding: 2rem;
             display: flex;
             flex-direction: column;
+            background: var(--bg-primary);
         }
         
         .signage-header {
@@ -874,17 +939,14 @@
         }
         
         .signage-room-name {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
         
         .signage-location {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             color: var(--text-secondary);
         }
         
@@ -893,48 +955,44 @@
         }
         
         .signage-time {
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 700;
             font-family: monospace;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            color: var(--text-primary);
         }
         
         .signage-date {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             color: var(--text-secondary);
         }
         
         .signage-status {
             background: var(--bg-secondary);
-            border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
             border: 2px solid;
+            box-shadow: var(--shadow);
         }
         
         .signage-status.available {
             border-color: var(--secondary);
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.05) 0%, transparent 100%);
         }
         
         .signage-status.occupied {
             border-color: var(--danger);
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, transparent 100%);
         }
         
         .status-label {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         
         .status-text {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
         }
         
@@ -942,54 +1000,57 @@
         .status-text.occupied { color: var(--danger); }
         
         .current-booking {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
             border-top: 1px solid var(--border);
         }
         
         .current-booking-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
         }
         
         .current-booking-time {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             color: var(--text-secondary);
         }
         
         .upcoming-section h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
         
         .upcoming-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
         
         .upcoming-item {
             background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
         
         .upcoming-item .time {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--primary);
-            min-width: 150px;
+            min-width: 130px;
         }
         
         .upcoming-item .title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             flex: 1;
+            color: var(--text-primary);
         }
         
         .upcoming-item .booker {
@@ -1030,11 +1091,11 @@
             }
             
             .signage-room-name {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
             
             .signage-time {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
         }
     </style>
@@ -1052,8 +1113,7 @@
             </div>
             
             <nav class="nav-tabs">
-                <button class="nav-tab active" data-tab="rooms">🚪 ห้องทั้งหมด</button>
-                <button class="nav-tab" data-tab="timeline">📊 ตารางเวลา</button>
+                <button class="nav-tab active" data-tab="main">🏠 หน้าหลัก</button>
                 <button class="nav-tab" data-tab="my-bookings">📋 การจองของฉัน</button>
             </nav>
             
@@ -1066,46 +1126,53 @@
     
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
-        <!-- Rooms Tab -->
-        <div class="tab-content active" id="rooms-tab">
-            <div class="room-grid" id="roomGrid"></div>
-        </div>
-        
-        <!-- Timeline Tab -->
-        <div class="tab-content" id="timeline-tab">
-            <div class="timeline-header">
-                <div class="timeline-nav">
-                    <button onclick="changeDate(-1)">←</button>
-                    <h2 class="timeline-title" id="timelineTitle"></h2>
-                    <button onclick="changeDate(1)">→</button>
-                    <button class="btn btn-secondary btn-small" onclick="goToToday()" style="white-space: nowrap;">วันนี้</button>
-                </div>
-            </div>
+        <!-- Main Tab (Timeline + Rooms) -->
+        <div class="tab-content active" id="main-tab">
             
-            <div class="timeline-container">
-                <div class="timeline-scroll">
-                    <div class="timeline-grid" id="timelineGrid"></div>
-                </div>
-                <div class="timeline-legend">
-                    <div class="legend-item">
-                        <div class="legend-color available"></div>
-                        <span>ว่าง (คลิกเพื่อจอง)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color booked"></div>
-                        <span>มีการจอง</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color my-booking"></div>
-                        <span>การจองของฉัน</span>
+            <!-- Timeline Section -->
+            <section class="timeline-section">
+                <div class="timeline-header">
+                    <h2 class="section-title">📊 ตารางการใช้ห้อง</h2>
+                    <div class="timeline-nav">
+                        <button onclick="changeDate(-1)">←</button>
+                        <span class="timeline-title" id="timelineTitle"></span>
+                        <button onclick="changeDate(1)">→</button>
+                        <button class="btn btn-secondary btn-small" onclick="goToToday()" style="white-space: nowrap;">วันนี้</button>
                     </div>
                 </div>
-            </div>
+                
+                <div class="timeline-container">
+                    <div class="timeline-scroll">
+                        <div class="timeline-grid" id="timelineGrid"></div>
+                    </div>
+                    <div class="timeline-legend">
+                        <div class="legend-item">
+                            <div class="legend-color available"></div>
+                            <span>ว่าง (คลิกเพื่อจอง)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color booked"></div>
+                            <span>มีการจอง</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color my-booking"></div>
+                            <span>การจองของฉัน</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Rooms Section -->
+            <section class="room-section">
+                <h2 class="section-title">🚪 ห้องทั้งหมด</h2>
+                <div class="room-grid" id="roomGrid"></div>
+            </section>
+            
         </div>
         
         <!-- My Bookings Tab -->
         <div class="tab-content" id="my-bookings-tab">
-            <h2 style="margin-bottom: 1.5rem;">📋 การจองของฉัน</h2>
+            <h2 class="section-title">📋 การจองของฉัน</h2>
             <div class="booking-list" id="myBookingsList"></div>
         </div>
     </main>
@@ -1154,7 +1221,7 @@
                     
                     <div class="form-group">
                         <label>วัตถุประสงค์</label>
-                        <textarea id="bookingPurpose" placeholder="ระบุวัตถุประสงค์การใช้ห้อง..."></textarea>
+                        <textarea id="bookingPurpose" rows="2" placeholder="ระบุวัตถุประสงค์การใช้ห้อง..."></textarea>
                     </div>
                     
                     <input type="hidden" id="bookingRoomId">
@@ -1171,7 +1238,7 @@
     <!-- Success Modal -->
     <div class="modal-overlay success-modal" id="successModal">
         <div class="modal">
-            <div class="modal-body" style="padding: 2.5rem;">
+            <div class="modal-body" style="padding: 2rem;">
                 <div class="success-icon">✓</div>
                 <h2>จองสำเร็จ!</h2>
                 <p>การจองห้องของคุณได้รับการยืนยันแล้ว</p>
@@ -1187,7 +1254,6 @@
 
     <script>
         // ==================== CONFIGURATION ====================
-        // 🔧 ตั้งค่า Teamup Calendar ที่นี่
         const TEAMUP_CONFIG = {
             API_KEY: '633ea517324fcd66017c2f5774ff682f1fc6408998462e06bf5f9e95b2181114',
             CALENDAR_ID: 'ksbwygkzbudducs6m4'
@@ -1202,7 +1268,7 @@
                 location: 'ชั้น 3 อาคารวิศวกรรมคอมพิวเตอร์',
                 facilities: ['โปรเจคเตอร์', 'Whiteboard', 'Video Conference', 'WiFi'],
                 image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
-                color: '#3B82F6',
+                color: '#4F46E5',
                 isActive: true,
             },
             {
@@ -1213,7 +1279,7 @@
                 location: 'ชั้น 3 อาคารวิศวกรรมคอมพิวเตอร์',
                 facilities: ['TV', 'Whiteboard', 'WiFi'],
                 image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop',
-                color: '#10B981',
+                color: '#059669',
                 isActive: true,
             },
             {
@@ -1224,7 +1290,7 @@
                 location: 'ชั้น 4 อาคารวิศวกรรมคอมพิวเตอร์',
                 facilities: ['โปรเจคเตอร์', 'ระบบเสียง', 'ไมค์ลอย', 'Live Streaming'],
                 image: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&h=600&fit=crop',
-                color: '#8B5CF6',
+                color: '#7C3AED',
                 isActive: true,
             },
             {
@@ -1235,7 +1301,7 @@
                 location: 'ชั้น 2 อาคารวิศวกรรมคอมพิวเตอร์',
                 facilities: ['คอมพิวเตอร์', 'โปรเจคเตอร์', 'เครื่องปริ้น'],
                 image: 'https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=800&h=600&fit=crop',
-                color: '#F59E0B',
+                color: '#D97706',
                 isActive: true,
             },
         ];
@@ -1452,6 +1518,7 @@
             const grid = document.getElementById('timelineGrid');
             const now = new Date();
             const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
             const isToday = selectedDate.toDateString() === now.toDateString();
             
             const activeRooms = rooms.filter(r => r.isActive);
@@ -1485,7 +1552,7 @@
                     cellTime.setHours(h.hour, h.half, 0, 0);
                     
                     const isCurrent = isToday && h.hour === currentHour && 
-                        ((h.half === 0 && now.getMinutes() < 30) || (h.half === 30 && now.getMinutes() >= 30));
+                        ((h.half === 0 && currentMinute < 30) || (h.half === 30 && currentMinute >= 30));
                     
                     // Check if there's a booking at this time
                     const booking = roomBookings.find(b => {
@@ -1519,9 +1586,8 @@
                     const isPast = cellTime < now;
                     
                     return `
-                        <div class="timeline-cell ${isCurrent ? 'current' : ''}" 
-                             onclick="${!booking && !isPast ? `showQuickBook('${room.id}', '${cellTime.toISOString()}', event)` : ''}"
-                             style="${booking ? 'cursor: default;' : ''} ${isPast ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        <div class="timeline-cell ${isCurrent ? 'current' : ''} ${isPast ? 'past' : ''}" 
+                             onclick="${!booking && !isPast ? `showQuickBook('${room.id}', '${cellTime.toISOString()}', event)` : ''}">
                             ${bookingHtml}
                         </div>
                     `;
@@ -1558,7 +1624,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
                         <h3>ยังไม่มีการจอง</h3>
-                        <p>ไปที่แท็บ "ตารางเวลา" เพื่อดูห้องว่างและจอง</p>
+                        <p>คลิกที่ตารางเวลาด้านบนเพื่อจองห้อง</p>
                     </div>
                 `;
             } else {
@@ -1566,7 +1632,7 @@
                 listDiv.innerHTML = myBookings.map(b => {
                     const room = rooms.find(r => r.id === b.roomId);
                     const dateStr = formatDate(b.startTime);
-                    const dateHeader = dateStr !== lastDate ? `<div style="font-size: 0.85rem; color: var(--text-muted); margin: 1.5rem 0 0.75rem 0.5rem; font-weight: 500;">${dateStr}</div>` : '';
+                    const dateHeader = dateStr !== lastDate ? `<div style="font-size: 0.85rem; color: var(--text-muted); margin: 1.25rem 0 0.6rem 0.25rem; font-weight: 500;">${dateStr}</div>` : '';
                     lastDate = dateStr;
                     
                     const start = new Date(b.startTime);
@@ -1576,7 +1642,7 @@
                     return dateHeader + `
                         <div class="booking-card">
                             <div class="booking-info">
-                                <div class="booking-color" style="background: ${room?.color || '#6366F1'};"></div>
+                                <div class="booking-color" style="background: ${room?.color || '#4F46E5'};"></div>
                                 <div class="booking-details">
                                     <h4>${room?.name || b.roomName}</h4>
                                     <p>${b.purpose || 'การจองห้อง'}</p>
@@ -1637,8 +1703,8 @@
             document.getElementById('quickBookRoom').textContent = room.name;
             document.getElementById('quickBookTime').textContent = `${formatTime(time)} - ${formatTime(addMinutes(time, 60))}`;
             
-            popup.style.left = Math.min(event.pageX, window.innerWidth - 280) + 'px';
-            popup.style.top = Math.min(event.pageY, window.innerHeight - 150) + 'px';
+            popup.style.left = Math.min(event.pageX, window.innerWidth - 250) + 'px';
+            popup.style.top = Math.min(event.pageY, window.innerHeight - 120) + 'px';
             popup.classList.add('show');
             
             // Close on click outside
@@ -1928,20 +1994,20 @@
             text-align: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #4F46E5;
         }
         
         .header h1 {
             font-size: 18pt;
             font-weight: bold;
             margin-bottom: 5px;
-            color: #1a1a2e;
+            color: #4F46E5;
         }
         
         .header h2 {
             font-size: 14pt;
             font-weight: normal;
-            color: #444;
+            color: #666;
             margin-bottom: 5px;
         }
         
@@ -1963,7 +2029,7 @@
         }
         
         th, td {
-            border: 1px solid #333;
+            border: 1px solid #ddd;
             padding: 4px 3px;
             text-align: center;
             vertical-align: top;
@@ -1971,7 +2037,7 @@
         }
         
         th {
-            background: #1a1a2e;
+            background: #4F46E5;
             color: white;
             font-weight: bold;
             padding: 8px 3px;
@@ -1979,7 +2045,7 @@
         
         th.time-header {
             width: 50px;
-            background: #2d2d44;
+            background: #3730A3;
         }
         
         th.day-header {
@@ -1998,19 +2064,19 @@
         }
         
         .time-cell {
-            background: #f0f0f0;
+            background: #f8fafc;
             font-weight: bold;
             font-size: 9pt;
             width: 50px;
         }
         
         .empty-cell {
-            background: #fafafa;
+            background: #ffffff;
             height: 35px;
         }
         
         .booked-cell {
-            background: #e8f4fd;
+            background: #EEF2FF;
             height: 35px;
             padding: 2px;
         }
@@ -2024,7 +2090,7 @@
         
         .booking-info-print strong {
             font-size: 8pt;
-            color: #1a1a2e;
+            color: #4F46E5;
         }
         
         .booking-time-print {
@@ -2067,15 +2133,15 @@
         .legend-box {
             width: 15px;
             height: 15px;
-            border: 1px solid #333;
+            border: 1px solid #ddd;
         }
         
         .legend-box.empty {
-            background: #fafafa;
+            background: #ffffff;
         }
         
         .legend-box.booked {
-            background: #e8f4fd;
+            background: #EEF2FF;
         }
         
         @media print {
