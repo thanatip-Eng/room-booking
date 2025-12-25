@@ -1437,7 +1437,8 @@
                                 <button class="btn btn-primary" onclick="openBookingModal('${room.id}')">
                                     📅 จองห้อง
                                 </button>
-                                <button class="btn btn-secondary" onclick="openSignage('${room.id}')">🖥️</button>
+                                <button class="btn btn-secondary" onclick="openSignage('${room.id}')" title="Display">🖥️</button>
+                                <button class="btn btn-secondary" onclick="printWeeklySchedule('${room.id}')" title="พิมพ์ตารางสัปดาห์">🖨️</button>
                             </div>
                         </div>
                     </div>
@@ -1801,6 +1802,340 @@
         
         function closeSuccessModal() {
             document.getElementById('successModal').classList.remove('active');
+        }
+        
+        // ==================== PRINT WEEKLY SCHEDULE ====================
+        function printWeeklySchedule(roomId) {
+            const room = rooms.find(r => r.id === roomId);
+            if (!room) return;
+            
+            // Get Monday of current week
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
+            
+            // Generate week days
+            const weekDays = [];
+            const dayNames = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                weekDays.push({
+                    date: date,
+                    name: dayNames[i],
+                    dateStr: date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })
+                });
+            }
+            
+            // Get bookings for this room in this week
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+            
+            const weekBookings = bookings.filter(b => {
+                const bStart = new Date(b.startTime);
+                return b.roomId === roomId && bStart >= monday && bStart <= sunday;
+            });
+            
+            // Time slots (7:00 - 20:00)
+            const timeSlots = [];
+            for (let h = 7; h <= 20; h++) {
+                timeSlots.push(`${h.toString().padStart(2, '0')}:00`);
+            }
+            
+            // Generate table rows
+            let tableRows = '';
+            timeSlots.forEach(time => {
+                const hour = parseInt(time.split(':')[0]);
+                let row = `<tr><td class="time-cell">${time}</td>`;
+                
+                weekDays.forEach(day => {
+                    const dayBookings = weekBookings.filter(b => {
+                        const bStart = new Date(b.startTime);
+                        const bEnd = new Date(b.endTime);
+                        const slotStart = new Date(day.date);
+                        slotStart.setHours(hour, 0, 0, 0);
+                        const slotEnd = new Date(day.date);
+                        slotEnd.setHours(hour, 59, 59, 999);
+                        
+                        return bStart <= slotEnd && bEnd > slotStart;
+                    });
+                    
+                    if (dayBookings.length > 0) {
+                        const b = dayBookings[0];
+                        const startTime = new Date(b.startTime);
+                        const endTime = new Date(b.endTime);
+                        const timeStr = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}-${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+                        
+                        row += `<td class="booked-cell">
+                            <div class="booking-info-print">
+                                <strong>${b.bookedBy?.split(' ').slice(-1)[0] || 'ไม่ระบุ'}</strong>
+                                <span class="booking-time-print">${timeStr}</span>
+                                ${b.purpose ? `<span class="booking-purpose">${b.purpose.substring(0, 20)}${b.purpose.length > 20 ? '...' : ''}</span>` : ''}
+                            </div>
+                        </td>`;
+                    } else {
+                        row += `<td class="empty-cell"></td>`;
+                    }
+                });
+                
+                row += '</tr>';
+                tableRows += row;
+            });
+            
+            // Create print window
+            const printWindow = window.open('', '_blank');
+            const now = new Date();
+            const updateDate = now.toLocaleDateString('th-TH', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const weekRange = `${monday.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })} - ${sunday.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+            
+            printWindow.document.write(`
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ตารางการใช้${room.name} - สัปดาห์ ${weekRange}</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+            font-size: 10pt;
+            color: #333;
+            background: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .header h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1a1a2e;
+        }
+        
+        .header h2 {
+            font-size: 14pt;
+            font-weight: normal;
+            color: #444;
+            margin-bottom: 5px;
+        }
+        
+        .header .room-info {
+            font-size: 10pt;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .header .update-date {
+            font-size: 9pt;
+            color: #888;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #333;
+            padding: 4px 3px;
+            text-align: center;
+            vertical-align: top;
+            font-size: 8pt;
+        }
+        
+        th {
+            background: #1a1a2e;
+            color: white;
+            font-weight: bold;
+            padding: 8px 3px;
+        }
+        
+        th.time-header {
+            width: 50px;
+            background: #2d2d44;
+        }
+        
+        th.day-header {
+            font-size: 9pt;
+        }
+        
+        th .day-name {
+            font-size: 10pt;
+            display: block;
+        }
+        
+        th .day-date {
+            font-size: 8pt;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+        
+        .time-cell {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 9pt;
+            width: 50px;
+        }
+        
+        .empty-cell {
+            background: #fafafa;
+            height: 35px;
+        }
+        
+        .booked-cell {
+            background: #e8f4fd;
+            height: 35px;
+            padding: 2px;
+        }
+        
+        .booking-info-print {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        
+        .booking-info-print strong {
+            font-size: 8pt;
+            color: #1a1a2e;
+        }
+        
+        .booking-time-print {
+            font-size: 7pt;
+            color: #666;
+        }
+        
+        .booking-purpose {
+            font-size: 6pt;
+            color: #888;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 8pt;
+            color: #888;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 8pt;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-box {
+            width: 15px;
+            height: 15px;
+            border: 1px solid #333;
+        }
+        
+        .legend-box.empty {
+            background: #fafafa;
+        }
+        
+        .legend-box.booked {
+            background: #e8f4fd;
+        }
+        
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 ตารางการใช้${room.name}</h1>
+        <h2>${room.nameEn || ''}</h2>
+        <div class="room-info">📍 ${room.location} | 👥 ความจุ ${room.capacity} ที่นั่ง</div>
+        <div class="room-info">📆 สัปดาห์: ${weekRange}</div>
+        <div class="update-date">🕐 อัพเดทข้อมูล: ${updateDate}</div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="time-header">เวลา</th>
+                ${weekDays.map(day => `
+                    <th class="day-header">
+                        <span class="day-name">${day.name}</span>
+                        <span class="day-date">${day.dateStr}</span>
+                    </th>
+                `).join('')}
+            </tr>
+        </thead>
+        <tbody>
+            ${tableRows}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box empty"></div>
+                <span>ว่าง</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box booked"></div>
+                <span>มีการจอง</span>
+            </div>
+        </div>
+        <p style="margin-top: 8px;">ระบบจองห้อง - ภาควิชาวิศวกรรมคอมพิวเตอร์ มช.</p>
+    </div>
+    
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    <\/script>
+</body>
+</html>
+            `);
+            
+            printWindow.document.close();
         }
         
         // ==================== SIGNAGE ====================
