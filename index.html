@@ -143,6 +143,7 @@
         .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
         .btn-secondary:hover { background: var(--bg-hover); }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #B91C1C; }
         .btn-small { padding: 0.45rem 0.75rem; font-size: 0.8rem; }
         .quick-book-popup { position: fixed; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; box-shadow: var(--shadow-lg); z-index: 200; min-width: 220px; display: none; }
         .quick-book-popup.show { display: block; animation: popIn 0.2s ease; }
@@ -255,7 +256,12 @@
                     <div class="form-group"><label>วัตถุประสงค์</label><textarea id="bookingPurpose" rows="2" placeholder="ระบุวัตถุประสงค์การใช้ห้อง..."></textarea></div>
                     <input type="hidden" id="bookingRoomId"><input type="hidden" id="bookingId">
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="closeBookingModal()">ยกเลิก</button><button type="submit" class="btn btn-primary">📅 ยืนยันการจอง</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteBookingBtn" onclick="deleteCurrentBooking()" style="display:none;">🗑️ ลบการจอง</button>
+                    <div style="flex:1;"></div>
+                    <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">ปิด</button>
+                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                </div>
             </form>
         </div>
     </div>
@@ -305,6 +311,8 @@
         function formatTime(date) { return new Date(date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }); }
         function formatDateTimeLocal(date) { const d = new Date(date); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
         function addMinutes(date, minutes) { return new Date(new Date(date).getTime() + minutes * 60000); }
+        function isSameDay(date1, date2) { const d1 = new Date(date1), d2 = new Date(date2); return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
+        function getDateOnly(date) { const d = new Date(date); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
         function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
         function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
         function updateSyncStatus(status) { const el = document.getElementById('syncStatus'); el.className = 'sync-status ' + status; const m = { online: 'เชื่อมต่อแล้ว', offline: 'ออฟไลน์', syncing: 'กำลังซิงค์...' }; el.innerHTML = '<div class="sync-dot"></div><span>' + m[status] + '</span>'; }
@@ -356,14 +364,14 @@
         function renderTimeline() {
             updateTitle();
             const grid = document.getElementById('timelineGrid'); const now = new Date();
-            const currentHour = now.getHours(), isToday = selectedDate.toDateString() === now.toDateString();
+            const currentHour = now.getHours(), isToday = isSameDay(selectedDate, now);
             const activeRooms = rooms.filter(r => r.isActive);
             const hours = []; for (let h = 7; h <= 20; h++) { hours.push({ hour: h, half: 0 }); hours.push({ hour: h, half: 30 }); }
             
             let html = '<div class="timeline-header-row"><div class="timeline-corner">ห้อง / เวลา</div>' + hours.map(h => '<div class="timeline-hour' + (isToday && h.hour === currentHour ? ' current' : '') + '">' + (h.half === 0 ? h.hour + ':00' : '') + '</div>').join('') + '</div>';
             
             activeRooms.forEach(room => {
-                const roomBookings = bookings.filter(b => new Date(b.startTime).toDateString() === selectedDate.toDateString() && b.roomId === room.id);
+                const roomBookings = bookings.filter(b => isSameDay(b.startTime, selectedDate) && b.roomId === room.id);
                 html += '<div class="timeline-room-row"><div class="timeline-room-name"><div class="timeline-room-color" style="background:' + room.color + ';"></div><div><div class="timeline-room-info">' + room.name + '</div><div class="timeline-room-capacity">👥 ' + room.capacity + '</div></div></div><div class="timeline-cells">';
                 hours.forEach(h => {
                     const cellTime = new Date(selectedDate); cellTime.setHours(h.hour, h.half, 0, 0);
@@ -389,7 +397,7 @@
             const grid = document.getElementById('weekGrid'); const now = new Date();
             const monday = getMonday(selectedDate);
             const dayNames = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
-            const weekDays = []; for (let i = 0; i < 7; i++) { const d = new Date(monday); d.setDate(monday.getDate() + i); weekDays.push({ date: d, name: dayNames[i], dateStr: d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }), isToday: d.toDateString() === now.toDateString() }); }
+            const weekDays = []; for (let i = 0; i < 7; i++) { const d = new Date(monday); d.setDate(monday.getDate() + i); weekDays.push({ date: d, name: dayNames[i], dateStr: d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }), isToday: isSameDay(d, now) }); }
             
             let html = '<div class="week-header-row"><div class="week-corner">เวลา</div>' + weekDays.map(d => '<div class="week-day-header' + (d.isToday ? ' today' : '') + '"><div class="week-day-name">' + d.name + '</div><div class="week-day-date">' + d.dateStr + '</div></div>').join('') + '</div>';
             
@@ -418,8 +426,8 @@
             let html = dayNames.map((n, i) => '<div class="month-header' + (i >= 5 ? ' weekend' : '') + '">' + n + '</div>').join('');
             let cd = new Date(startDate);
             for (let i = 0; i < 42; i++) {
-                const isCurr = cd.getMonth() === month, isToday = cd.toDateString() === now.toDateString(), isWknd = cd.getDay() === 0 || cd.getDay() === 6;
-                const dayBookings = bookings.filter(b => new Date(b.startTime).toDateString() === cd.toDateString()).sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+                const isCurr = cd.getMonth() === month, isToday = isSameDay(cd, now), isWknd = cd.getDay() === 0 || cd.getDay() === 6;
+                const dayBookings = bookings.filter(b => isSameDay(b.startTime, cd)).sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
                 let bHtml = ''; dayBookings.slice(0, 3).forEach(b => { const room = rooms.find(r => r.id === b.roomId); const isMine = b.bookedById === currentUserId; bHtml += '<div class="month-booking" style="background:' + (isMine ? 'var(--accent)' : (room?.color || '#4F46E5')) + ';">' + formatTime(b.startTime) + ' ' + (room?.name?.substring(0, 6) || '') + '</div>'; });
                 if (dayBookings.length > 3) bHtml += '<div class="month-booking-more">+' + (dayBookings.length - 3) + ' รายการ</div>';
                 html += '<div class="month-day' + (!isCurr ? ' other-month' : '') + (isToday ? ' today' : '') + (isWknd ? ' weekend' : '') + '" onclick="viewDayBookings(\'' + cd.toISOString() + '\')"><div class="month-day-number">' + cd.getDate() + '</div><div class="month-day-bookings">' + bHtml + '</div></div>';
@@ -462,8 +470,22 @@
         function closeQuickBook() { document.getElementById('quickBookPopup').classList.remove('show'); document.removeEventListener('click', closeQuickBook); }
         function confirmQuickBook() { if (quickBookData) { let roomId = quickBookData.roomId; const sel = document.getElementById('quickRoomSelect'); if (sel) roomId = sel.value; if (roomId) openBookingModal(roomId, null, quickBookData.time); } closeQuickBook(); }
         
-        function openBookingModal(roomId, bookingId = null, presetTime = null) { const modal = document.getElementById('bookingModal'); const room = rooms.find(r => r.id === roomId); const userSelect = document.getElementById('bookingUser'); userSelect.innerHTML = users.filter(u => u.isActive).map(u => '<option value="' + u.id + '">' + u.name + '</option>').join(''); if (bookingId) { const b = bookings.find(x => x.id === bookingId); document.getElementById('bookingModalTitle').textContent = '✏️ แก้ไขการจอง - ' + room?.name; document.getElementById('bookingUser').value = b.bookedById; document.getElementById('bookingStart').value = formatDateTimeLocal(b.startTime); document.getElementById('bookingDuration').value = b.duration; document.getElementById('bookingPurpose').value = b.purpose || ''; document.getElementById('bookingId').value = bookingId; } else { document.getElementById('bookingModalTitle').textContent = '📅 จองห้อง - ' + room?.name; document.getElementById('bookingUser').value = currentUserId; document.getElementById('bookingStart').value = formatDateTimeLocal(presetTime || new Date()); document.getElementById('bookingDuration').value = '60'; document.getElementById('bookingPurpose').value = ''; document.getElementById('bookingId').value = ''; } document.getElementById('bookingRoomId').value = roomId; modal.classList.add('active'); }
+        function openBookingModal(roomId, bookingId = null, presetTime = null) { const modal = document.getElementById('bookingModal'); const room = rooms.find(r => r.id === roomId); const userSelect = document.getElementById('bookingUser'); userSelect.innerHTML = users.filter(u => u.isActive).map(u => '<option value="' + u.id + '">' + u.name + '</option>').join(''); const deleteBtn = document.getElementById('deleteBookingBtn'); if (bookingId) { const b = bookings.find(x => x.id === bookingId); document.getElementById('bookingModalTitle').textContent = '✏️ แก้ไขการจอง - ' + room?.name; document.getElementById('bookingUser').value = b.bookedById; document.getElementById('bookingStart').value = formatDateTimeLocal(b.startTime); document.getElementById('bookingDuration').value = b.duration; document.getElementById('bookingPurpose').value = b.purpose || ''; document.getElementById('bookingId').value = bookingId; deleteBtn.style.display = 'inline-flex'; } else { document.getElementById('bookingModalTitle').textContent = '📅 จองห้อง - ' + room?.name; document.getElementById('bookingUser').value = currentUserId; document.getElementById('bookingStart').value = formatDateTimeLocal(presetTime || new Date()); document.getElementById('bookingDuration').value = '60'; document.getElementById('bookingPurpose').value = ''; document.getElementById('bookingId').value = ''; deleteBtn.style.display = 'none'; } document.getElementById('bookingRoomId').value = roomId; modal.classList.add('active'); }
         function closeBookingModal() { document.getElementById('bookingModal').classList.remove('active'); }
+        
+        async function deleteCurrentBooking() {
+            const bookingId = document.getElementById('bookingId').value;
+            if (!bookingId) return;
+            if (confirm('⚠️ ต้องการยกเลิกการจองนี้หรือไม่?\n\nการยกเลิกจะไม่สามารถกู้คืนได้')) {
+                const success = await deleteBookingFromFirebase(bookingId);
+                if (success) {
+                    closeBookingModal();
+                    alert('✅ ยกเลิกการจองเรียบร้อยแล้ว');
+                } else {
+                    alert('❌ ไม่สามารถยกเลิกได้ กรุณาลองใหม่');
+                }
+            }
+        }
         
         async function saveBooking(event) { event.preventDefault(); const id = document.getElementById('bookingId').value; const roomId = document.getElementById('bookingRoomId').value; const userId = document.getElementById('bookingUser').value; const user = users.find(u => u.id === userId); const room = rooms.find(r => r.id === roomId); const startTime = new Date(document.getElementById('bookingStart').value); const duration = parseInt(document.getElementById('bookingDuration').value); const endTime = addMinutes(startTime, duration); const purpose = document.getElementById('bookingPurpose').value; const hasConflict = bookings.some(b => { if (b.id === id || b.roomId !== roomId) return false; const s = new Date(b.startTime), e = new Date(b.endTime); return (startTime < e && endTime > s); }); if (hasConflict) { alert('❌ ช่วงเวลานี้มีการจองแล้ว'); return; } const booking = { id: id || generateId(), roomId, roomName: room?.name, bookedById: userId, bookedBy: user?.name, startTime: startTime.toISOString(), endTime: endTime.toISOString(), duration, purpose }; const success = await saveBookingToFirebase(booking); if (success) { closeBookingModal(); showSuccessModal(booking, room); } else { alert('❌ ไม่สามารถบันทึกได้ กรุณาลองใหม่'); } }
         function editBooking(id) { const b = bookings.find(x => x.id === id); if (b && b.bookedById === currentUserId) openBookingModal(b.roomId, id); }
