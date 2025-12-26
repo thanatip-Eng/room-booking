@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ระบบจองห้อง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4F46E5; --primary-dark: #3730A3; --secondary: #059669; --accent: #D97706; --danger: #DC2626;
+            --bg-primary: #F8FAFC; --bg-secondary: #FFFFFF; --bg-card: #F1F5F9; --bg-hover: #E2E8F0;
+            --text-primary: #1E293B; --text-secondary: #475569; --text-muted: #94A3B8;
+            --border: #E2E8F0; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Noto Sans Thai', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--danger) 0%, var(--accent) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo-text h1 { font-size: 1.25rem; font-weight: 700; }
+        .logo-text p { font-size: 0.75rem; color: var(--text-muted); }
+        .nav-tabs { display: flex; gap: 0.25rem; background: var(--bg-card); padding: 0.25rem; border-radius: 12px; }
+        .nav-tab { padding: 0.6rem 1.2rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.9rem; font-weight: 500; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .nav-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+        .nav-tab.active { background: var(--danger); color: white; }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .section-title { font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .btn { padding: 0.6rem 1.1rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-small { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+        .data-table { width: 100%; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: var(--bg-card); font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--bg-hover); }
+        .status-badge { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+        .status-badge.active { background: rgba(5, 150, 105, 0.1); color: var(--secondary); }
+        .status-badge.inactive { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+        .color-dot { width: 20px; height: 20px; border-radius: 50%; display: inline-block; vertical-align: middle; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 1rem; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: var(--bg-secondary); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); }
+        .modal-header h2 { font-size: 1.1rem; font-weight: 600; }
+        .modal-close { width: 36px; height: 36px; border: none; background: var(--bg-secondary); border-radius: 8px; cursor: pointer; font-size: 1.25rem; }
+        .modal-close:hover { background: var(--danger); color: white; }
+        .modal-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; font-size: 0.95rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: flex-end; background: var(--bg-card); }
+        .sync-status { position: fixed; bottom: 1rem; right: 1rem; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; z-index: 100; }
+        .sync-status.online { background: var(--secondary); color: white; }
+        .sync-status.offline { background: var(--danger); color: white; }
+        .sync-status.syncing { background: var(--accent); color: white; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+        .stat-card h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        @media (max-width: 768px) { .header-content { flex-direction: column; } .form-row { grid-template-columns: 1fr; } .data-table { display: block; overflow-x: auto; } }
+    </style>
+</head>
+<body>
+    <div class="sync-status online" id="syncStatus"><div class="sync-dot"></div><span>เชื่อมต่อแล้ว</span></div>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo"><div class="logo-icon">⚙️</div><div class="logo-text"><h1>Admin Panel</h1><p>ระบบจัดการห้องประชุม</p></div></div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="rooms">🚪 จัดการห้อง</button>
+                <button class="nav-tab" data-tab="users">👥 จัดการผู้ใช้</button>
+                <button class="nav-tab" data-tab="bookings">📅 การจองทั้งหมด</button>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <a href="index.html" class="back-link">← กลับหน้าจอง</a>
+        <div class="stats-grid">
+            <div class="stat-card"><h3>🚪 ห้องทั้งหมด</h3><div class="value" id="statRooms">0</div></div>
+            <div class="stat-card"><h3>👥 ผู้ใช้งาน</h3><div class="value" id="statUsers">0</div></div>
+            <div class="stat-card"><h3>📅 การจองวันนี้</h3><div class="value" id="statTodayBookings">0</div></div>
+            <div class="stat-card"><h3>📊 การจองทั้งหมด</h3><div class="value" id="statTotalBookings">0</div></div>
+        </div>
+        <div class="tab-content active" id="rooms-tab">
+            <div class="section-header"><h2 class="section-title">🚪 จัดการห้อง</h2><button class="btn btn-primary" onclick="openRoomModal()">+ เพิ่มห้อง</button></div>
+            <table class="data-table"><thead><tr><th>สี</th><th>ชื่อห้อง</th><th>ความจุ</th><th>สถานที่</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="roomsTableBody"></tbody></table>
+        </div>
+        <div class="tab-content" id="users-tab">
+            <div class="section-header"><h2 class="section-title">👥 จัดการผู้ใช้</h2><button class="btn btn-primary" onclick="openUserModal()">+ เพิ่มผู้ใช้</button></div>
+            <table class="data-table"><thead><tr><th>ชื่อ</th><th>อีเมล</th><th>บทบาท</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="usersTableBody"></tbody></table>
+        </div>
+        <div class="tab-content" id="bookings-tab">
+            <div class="section-header"><h2 class="section-title">📅 การจองทั้งหมด</h2></div>
+            <table class="data-table"><thead><tr><th>ห้อง</th><th>ผู้จอง</th><th>วันที่</th><th>เวลา</th><th>วัตถุประสงค์</th><th>จัดการ</th></tr></thead><tbody id="bookingsTableBody"></tbody></table>
+        </div>
+    </main>
+    <div class="modal-overlay" id="roomModal">
+        <div class="modal">
+            <div class="modal-header"><h2 id="roomModalTitle">เพิ่มห้อง</h2><button class="modal-close" onclick="closeRoomModal()">×</button></div>
+            <form id="roomForm" onsubmit="saveRoom(event)">
+                <div class="modal-body">
+                    <div class="form-row"><div class="form-group"><label>ชื่อห้อง (ไทย) *</label><input type="text" id="roomName" required></div><div class="form-group"><label>ชื่อห้อง (อังกฤษ)</label><input type="text" id="roomNameEn"></div></div>
+                    <div class="form-row"><div class="form-group"><label>ความจุ *</label><input type="number" id="roomCapacity" min="1" required></div><div class="form-group"><label>สี</label><input type="color" id="roomColor" value="#4F46E5"></div></div>
+                    <div class="form-group"><label>สถานที่ *</label><input type="text" id="roomLocation" required></div>
+                    <div class="form-group"><label>รูปภาพ URL</label><input type="url" id="roomImage" placeholder="https://..."></div>
+                    <div class="form-group"><label>สิ่งอำนวยความสะดวก (คั่นด้วย ,)</label><input type="text" id="roomFacilities" placeholder="โปรเจคเตอร์, Whiteboard, WiFi"></div>
+                    <div class="form-group"><label>สถานะ</label><select id="roomActive"><option value="true">เปิดใช้งาน</option><option value="false">ปิดใช้งาน</option></select></div>
+                    <input type="hidden" id="roomId">
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="closeRoomModal()">ยกเลิก</button><button type="submit" class="btn btn-primary">บันทึก</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header"><h2 id="userModalTitle">เพิ่มผู้ใช้</h2><button class="modal-close" onclick="closeUserModal()">×</button></div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="userName" required></div>
+                    <div class="form-group"><label>อีเมล *</label><input type="email" id="userEmail" required></div>
+                    <div class="form-group"><label>บทบาท</label><select id="userRole"><option value="user">ผู้ใช้ทั่วไป</option><option value="staff">เจ้าหน้าที่</option><option value="admin">ผู้ดูแลระบบ</option></select></div>
+                    <div class="form-group"><label>สถานะ</label><select id="userActive"><option value="true">เปิดใช้งาน</option><option value="false">ปิดใช้งาน</option></select></div>
+                    <input type="hidden" id="userId">
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="closeUserModal()">ยกเลิก</button><button type="submit" class="btn btn-primary">บันทึก</button></div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBSCntyH25CqpHXo9aPwxPknwmzeTXpmE8", authDomain: "room-booking-cpe-422ae.firebaseapp.com", projectId: "room-booking-cpe-422ae", storageBucket: "room-booking-cpe-422ae.firebasestorage.app", messagingSenderId: "649495675464", appId: "1:649495675464:web:c3f44b83871f6368e50e7d" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        let rooms = [], users = [], bookings = [];
+        
+        function generateId() { return Math.random().toString(36).substr(2, 9); }
+        function formatDate(date) { return new Date(date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }); }
+        function formatTime(date) { return new Date(date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }); }
+        function updateSyncStatus(status) { const el = document.getElementById('syncStatus'); el.className = 'sync-status ' + status; const m = { online: 'เชื่อมต่อแล้ว', offline: 'ออฟไลน์', syncing: 'กำลังซิงค์...' }; el.innerHTML = '<div class="sync-dot"></div><span>' + m[status] + '</span>'; }
+        
+        function setupRealtimeListeners() {
+            db.collection('rooms').onSnapshot(s => { rooms = s.docs.map(d => ({ id: d.id, ...d.data() })); renderRoomsTable(); updateStats(); }, () => updateSyncStatus('offline'));
+            db.collection('users').onSnapshot(s => { users = s.docs.map(d => ({ id: d.id, ...d.data() })); renderUsersTable(); updateStats(); });
+            db.collection('bookings').onSnapshot(s => { bookings = s.docs.map(d => ({ id: d.id, ...d.data() })); renderBookingsTable(); updateStats(); });
+            updateSyncStatus('online');
+        }
+        
+        function updateStats() {
+            document.getElementById('statRooms').textContent = rooms.filter(r => r.isActive).length;
+            document.getElementById('statUsers').textContent = users.filter(u => u.isActive).length;
+            const today = new Date().toDateString();
+            document.getElementById('statTodayBookings').textContent = bookings.filter(b => new Date(b.startTime).toDateString() === today).length;
+            document.getElementById('statTotalBookings').textContent = bookings.length;
+        }
+        
+        function renderRoomsTable() {
+            document.getElementById('roomsTableBody').innerHTML = rooms.map(r => '<tr><td><span class="color-dot" style="background:' + r.color + '"></span></td><td><strong>' + r.name + '</strong><br><small style="color:var(--text-muted)">' + (r.nameEn || '') + '</small></td><td>👥 ' + r.capacity + '</td><td>' + r.location + '</td><td><span class="status-badge ' + (r.isActive ? 'active' : 'inactive') + '">' + (r.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน') + '</span></td><td><button class="btn btn-secondary btn-small" onclick="editRoom(\'' + r.id + '\')">✏️</button> <button class="btn btn-danger btn-small" onclick="deleteRoom(\'' + r.id + '\')">🗑️</button></td></tr>').join('');
+        }
+        
+        function renderUsersTable() {
+            const roleNames = { admin: 'ผู้ดูแลระบบ', staff: 'เจ้าหน้าที่', user: 'ผู้ใช้ทั่วไป' };
+            document.getElementById('usersTableBody').innerHTML = users.map(u => '<tr><td><strong>' + u.name + '</strong></td><td>' + u.email + '</td><td>' + (roleNames[u.role] || u.role) + '</td><td><span class="status-badge ' + (u.isActive ? 'active' : 'inactive') + '">' + (u.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน') + '</span></td><td><button class="btn btn-secondary btn-small" onclick="editUser(\'' + u.id + '\')">✏️</button> <button class="btn btn-danger btn-small" onclick="deleteUser(\'' + u.id + '\')">🗑️</button></td></tr>').join('');
+        }
+        
+        function renderBookingsTable() {
+            const sorted = [...bookings].sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            document.getElementById('bookingsTableBody').innerHTML = sorted.map(b => { const room = rooms.find(r => r.id === b.roomId); return '<tr><td><span class="color-dot" style="background:' + (room?.color || '#ccc') + '"></span> ' + (room?.name || b.roomName || 'ไม่ระบุ') + '</td><td>' + b.bookedBy + '</td><td>' + formatDate(b.startTime) + '</td><td>' + formatTime(b.startTime) + ' - ' + formatTime(b.endTime) + '</td><td>' + (b.purpose || '-') + '</td><td><button class="btn btn-danger btn-small" onclick="deleteBooking(\'' + b.id + '\')">🗑️</button></td></tr>'; }).join('');
+        }
+        
+        function setupTabs() { document.querySelectorAll('.nav-tab').forEach(tab => { tab.onclick = () => { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.tab + '-tab').classList.add('active'); }; }); }
+        
+        function openRoomModal(id = null) { document.getElementById('roomModalTitle').textContent = id ? '✏️ แก้ไขห้อง' : '+ เพิ่มห้องใหม่'; if (id) { const r = rooms.find(x => x.id === id); document.getElementById('roomId').value = r.id; document.getElementById('roomName').value = r.name; document.getElementById('roomNameEn').value = r.nameEn || ''; document.getElementById('roomCapacity').value = r.capacity; document.getElementById('roomColor').value = r.color || '#4F46E5'; document.getElementById('roomLocation').value = r.location; document.getElementById('roomImage').value = r.image || ''; document.getElementById('roomFacilities').value = (r.facilities || []).join(', '); document.getElementById('roomActive').value = r.isActive ? 'true' : 'false'; } else { document.getElementById('roomForm').reset(); document.getElementById('roomId').value = ''; document.getElementById('roomColor').value = '#4F46E5'; } document.getElementById('roomModal').classList.add('active'); }
+        function closeRoomModal() { document.getElementById('roomModal').classList.remove('active'); }
+        function editRoom(id) { openRoomModal(id); }
+        
+        async function saveRoom(e) { e.preventDefault(); updateSyncStatus('syncing'); const id = document.getElementById('roomId').value || generateId(); const room = { id, name: document.getElementById('roomName').value, nameEn: document.getElementById('roomNameEn').value, capacity: parseInt(document.getElementById('roomCapacity').value), color: document.getElementById('roomColor').value, location: document.getElementById('roomLocation').value, image: document.getElementById('roomImage').value || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop', facilities: document.getElementById('roomFacilities').value.split(',').map(f => f.trim()).filter(f => f), isActive: document.getElementById('roomActive').value === 'true' }; try { await db.collection('rooms').doc(id).set(room); updateSyncStatus('online'); closeRoomModal(); } catch (err) { updateSyncStatus('offline'); alert('เกิดข้อผิดพลาด'); } }
+        
+        async function deleteRoom(id) { if (confirm('ต้องการลบห้องนี้หรือไม่?')) { updateSyncStatus('syncing'); try { await db.collection('rooms').doc(id).delete(); updateSyncStatus('online'); } catch (err) { updateSyncStatus('offline'); } } }
+        
+        function openUserModal(id = null) { document.getElementById('userModalTitle').textContent = id ? '✏️ แก้ไขผู้ใช้' : '+ เพิ่มผู้ใช้ใหม่'; if (id) { const u = users.find(x => x.id === id); document.getElementById('userId').value = u.id; document.getElementById('userName').value = u.name; document.getElementById('userEmail').value = u.email; document.getElementById('userRole').value = u.role || 'user'; document.getElementById('userActive').value = u.isActive ? 'true' : 'false'; } else { document.getElementById('userForm').reset(); document.getElementById('userId').value = ''; } document.getElementById('userModal').classList.add('active'); }
+        function closeUserModal() { document.getElementById('userModal').classList.remove('active'); }
+        function editUser(id) { openUserModal(id); }
+        
+        async function saveUser(e) { e.preventDefault(); updateSyncStatus('syncing'); const id = document.getElementById('userId').value || generateId(); const user = { id, name: document.getElementById('userName').value, email: document.getElementById('userEmail').value, role: document.getElementById('userRole').value, isActive: document.getElementById('userActive').value === 'true' }; try { await db.collection('users').doc(id).set(user); updateSyncStatus('online'); closeUserModal(); } catch (err) { updateSyncStatus('offline'); alert('เกิดข้อผิดพลาด'); } }
+        
+        async function deleteUser(id) { if (confirm('ต้องการลบผู้ใช้นี้หรือไม่?')) { updateSyncStatus('syncing'); try { await db.collection('users').doc(id).delete(); updateSyncStatus('online'); } catch (err) { updateSyncStatus('offline'); } } }
+        
+        async function deleteBooking(id) { if (confirm('ต้องการลบการจองนี้หรือไม่?')) { updateSyncStatus('syncing'); try { await db.collection('bookings').doc(id).delete(); updateSyncStatus('online'); } catch (err) { updateSyncStatus('offline'); } } }
+        
+        setupTabs();
+        setupRealtimeListeners();
+    </script>
+</body>
+</html>
