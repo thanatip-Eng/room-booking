@@ -165,6 +165,17 @@
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; font-size: 0.95rem; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .recurring-section { margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
+        .recurring-toggle { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .recurring-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+        .recurring-toggle label { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); cursor: pointer; }
+        .recurring-options { background: var(--bg-card); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); }
+        .day-selector { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .day-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--bg-secondary); border-radius: 8px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .day-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .day-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .recurring-preview { margin-top: 1rem; padding: 0.75rem; background: rgba(79, 70, 229, 0.05); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); }
+        .recurring-preview strong { color: var(--primary); }
         .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: flex-end; background: var(--bg-card); }
         .success-modal .modal { max-width: 380px; text-align: center; }
         .success-icon { width: 70px; height: 70px; background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem; animation: bounceIn 0.5s ease; color: white; }
@@ -254,6 +265,14 @@
                     <div class="form-group"><label>ผู้จอง *</label><select id="bookingUser" required></select></div>
                     <div class="form-row"><div class="form-group"><label>วันเวลาเริ่มต้น *</label><input type="datetime-local" id="bookingStart" required></div><div class="form-group"><label>ระยะเวลา *</label><select id="bookingDuration" required><option value="30">30 นาที</option><option value="60" selected>1 ชั่วโมง</option><option value="90">1.5 ชั่วโมง</option><option value="120">2 ชั่วโมง</option><option value="180">3 ชั่วโมง</option><option value="240">4 ชั่วโมง</option></select></div></div>
                     <div class="form-group"><label>วัตถุประสงค์</label><textarea id="bookingPurpose" rows="2" placeholder="ระบุวัตถุประสงค์การใช้ห้อง..."></textarea></div>
+                    <div class="recurring-section">
+                        <div class="recurring-toggle"><input type="checkbox" id="recurringEnabled" onchange="toggleRecurring()"><label for="recurringEnabled">🔄 จองซ้ำ (Recurring)</label></div>
+                        <div class="recurring-options" id="recurringOptions" style="display:none;">
+                            <div class="form-row"><div class="form-group"><label>ทำซ้ำทุก</label><div style="display:flex;gap:0.5rem;align-items:center;"><input type="number" id="repeatEvery" value="1" min="1" max="12" style="width:60px;"><select id="repeatUnit"><option value="week">สัปดาห์</option><option value="day">วัน</option></select></div></div><div class="form-group"><label>จนถึงวันที่</label><input type="date" id="repeatUntil"></div></div>
+                            <div class="form-group" id="daySelectGroup"><label>เลือกวัน</label><div class="day-selector"><button type="button" class="day-btn" data-day="1">จ</button><button type="button" class="day-btn" data-day="2">อ</button><button type="button" class="day-btn" data-day="3">พ</button><button type="button" class="day-btn" data-day="4">พฤ</button><button type="button" class="day-btn" data-day="5">ศ</button><button type="button" class="day-btn" data-day="6">ส</button><button type="button" class="day-btn" data-day="0">อา</button></div></div>
+                            <div class="recurring-preview" id="recurringPreview"></div>
+                        </div>
+                    </div>
                     <input type="hidden" id="bookingRoomId"><input type="hidden" id="bookingId">
                 </div>
                 <div class="modal-footer">
@@ -406,7 +425,14 @@
                 weekDays.forEach(day => {
                     const cellTime = new Date(day.date); cellTime.setHours(h, 0, 0, 0);
                     const isPast = cellTime < now;
-                    const cellBookings = bookings.filter(b => { const s = new Date(b.startTime), e = new Date(b.endTime); const ss = new Date(day.date); ss.setHours(h, 0, 0, 0); const se = new Date(day.date); se.setHours(h, 59, 59, 999); return s <= se && e > ss; });
+                    // กรองเฉพาะ booking ที่อยู่ในวันนั้นก่อน แล้วค่อยเช็คเวลา
+                    const cellBookings = bookings.filter(b => { 
+                        if (!isSameDay(b.startTime, day.date)) return false;
+                        const s = new Date(b.startTime), e = new Date(b.endTime); 
+                        const cellStart = new Date(day.date); cellStart.setHours(h, 0, 0, 0); 
+                        const cellEnd = new Date(day.date); cellEnd.setHours(h, 59, 59, 999); 
+                        return s <= cellEnd && e > cellStart; 
+                    });
                     let bHtml = ''; cellBookings.slice(0, 2).forEach((b, idx) => { const room = rooms.find(r => r.id === b.roomId); const isMine = b.bookedById === currentUserId; bHtml += '<div class="week-booking" style="top:' + (idx * 24 + 2) + 'px;background:' + (isMine ? 'var(--accent)' : (room?.color || '#4F46E5')) + ';" title="' + (room?.name || '') + ': ' + b.bookedBy + '">' + (room?.name?.substring(0, 6) || '') + ' - ' + b.bookedBy.split(' ')[0] + '</div>'; });
                     if (cellBookings.length > 2) bHtml += '<div class="week-booking" style="top:50px;background:var(--text-muted);">+' + (cellBookings.length - 2) + '</div>';
                     html += '<div class="week-cell' + (day.isToday ? ' today' : '') + (isPast ? ' past' : '') + '" onclick="' + (!isPast && cellBookings.length === 0 ? "showQuickBookWeek('" + cellTime.toISOString() + "',event)" : '') + '">' + bHtml + '</div>';
@@ -470,7 +496,128 @@
         function closeQuickBook() { document.getElementById('quickBookPopup').classList.remove('show'); document.removeEventListener('click', closeQuickBook); }
         function confirmQuickBook() { if (quickBookData) { let roomId = quickBookData.roomId; const sel = document.getElementById('quickRoomSelect'); if (sel) roomId = sel.value; if (roomId) openBookingModal(roomId, null, quickBookData.time); } closeQuickBook(); }
         
-        function openBookingModal(roomId, bookingId = null, presetTime = null) { const modal = document.getElementById('bookingModal'); const room = rooms.find(r => r.id === roomId); const userSelect = document.getElementById('bookingUser'); userSelect.innerHTML = users.filter(u => u.isActive).map(u => '<option value="' + u.id + '">' + u.name + '</option>').join(''); const deleteBtn = document.getElementById('deleteBookingBtn'); if (bookingId) { const b = bookings.find(x => x.id === bookingId); document.getElementById('bookingModalTitle').textContent = '✏️ แก้ไขการจอง - ' + room?.name; document.getElementById('bookingUser').value = b.bookedById; document.getElementById('bookingStart').value = formatDateTimeLocal(b.startTime); document.getElementById('bookingDuration').value = b.duration; document.getElementById('bookingPurpose').value = b.purpose || ''; document.getElementById('bookingId').value = bookingId; deleteBtn.style.display = 'inline-flex'; } else { document.getElementById('bookingModalTitle').textContent = '📅 จองห้อง - ' + room?.name; document.getElementById('bookingUser').value = currentUserId; document.getElementById('bookingStart').value = formatDateTimeLocal(presetTime || new Date()); document.getElementById('bookingDuration').value = '60'; document.getElementById('bookingPurpose').value = ''; document.getElementById('bookingId').value = ''; deleteBtn.style.display = 'none'; } document.getElementById('bookingRoomId').value = roomId; modal.classList.add('active'); }
+        function openBookingModal(roomId, bookingId = null, presetTime = null) { 
+            const modal = document.getElementById('bookingModal'); const room = rooms.find(r => r.id === roomId); 
+            const userSelect = document.getElementById('bookingUser'); 
+            userSelect.innerHTML = users.filter(u => u.isActive).map(u => '<option value="' + u.id + '">' + u.name + '</option>').join(''); 
+            const deleteBtn = document.getElementById('deleteBookingBtn'); 
+            // Reset recurring options
+            document.getElementById('recurringEnabled').checked = false;
+            document.getElementById('recurringOptions').style.display = 'none';
+            document.getElementById('repeatEvery').value = '1';
+            document.getElementById('repeatUnit').value = 'week';
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('recurringPreview').innerHTML = '';
+            // Set default until date (3 months from now)
+            const defaultUntil = new Date(); defaultUntil.setMonth(defaultUntil.getMonth() + 3);
+            document.getElementById('repeatUntil').value = defaultUntil.toISOString().split('T')[0];
+            
+            if (bookingId) { 
+                const b = bookings.find(x => x.id === bookingId); 
+                document.getElementById('bookingModalTitle').textContent = '✏️ แก้ไขการจอง - ' + room?.name; 
+                document.getElementById('bookingUser').value = b.bookedById; 
+                document.getElementById('bookingStart').value = formatDateTimeLocal(b.startTime); 
+                document.getElementById('bookingDuration').value = b.duration; 
+                document.getElementById('bookingPurpose').value = b.purpose || ''; 
+                document.getElementById('bookingId').value = bookingId; 
+                deleteBtn.style.display = 'inline-flex'; 
+                // Hide recurring for edit mode
+                document.querySelector('.recurring-section').style.display = 'none';
+            } else { 
+                document.getElementById('bookingModalTitle').textContent = '📅 จองห้อง - ' + room?.name; 
+                document.getElementById('bookingUser').value = currentUserId; 
+                document.getElementById('bookingStart').value = formatDateTimeLocal(presetTime || new Date()); 
+                document.getElementById('bookingDuration').value = '60'; 
+                document.getElementById('bookingPurpose').value = ''; 
+                document.getElementById('bookingId').value = ''; 
+                deleteBtn.style.display = 'none'; 
+                document.querySelector('.recurring-section').style.display = 'block';
+                // Set default day based on start time
+                const startDay = (presetTime || new Date()).getDay();
+                document.querySelector('.day-btn[data-day="' + startDay + '"]')?.classList.add('active');
+            } 
+            document.getElementById('bookingRoomId').value = roomId; 
+            modal.classList.add('active'); 
+        }
+        
+        function toggleRecurring() {
+            const enabled = document.getElementById('recurringEnabled').checked;
+            document.getElementById('recurringOptions').style.display = enabled ? 'block' : 'none';
+            const unit = document.getElementById('repeatUnit').value;
+            document.getElementById('daySelectGroup').style.display = unit === 'week' ? 'block' : 'none';
+            if (enabled) updateRecurringPreview();
+        }
+        
+        function setupRecurringHandlers() {
+            // Day buttons
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.onclick = () => { btn.classList.toggle('active'); updateRecurringPreview(); };
+            });
+            // Repeat unit change
+            document.getElementById('repeatUnit').onchange = () => {
+                const unit = document.getElementById('repeatUnit').value;
+                document.getElementById('daySelectGroup').style.display = unit === 'week' ? 'block' : 'none';
+                updateRecurringPreview();
+            };
+            // Other inputs
+            document.getElementById('repeatEvery').onchange = updateRecurringPreview;
+            document.getElementById('repeatUntil').onchange = updateRecurringPreview;
+            document.getElementById('bookingStart').onchange = () => {
+                const startDay = new Date(document.getElementById('bookingStart').value).getDay();
+                document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector('.day-btn[data-day="' + startDay + '"]')?.classList.add('active');
+                updateRecurringPreview();
+            };
+        }
+        
+        function getRecurringDates() {
+            const startTime = new Date(document.getElementById('bookingStart').value);
+            const repeatEvery = parseInt(document.getElementById('repeatEvery').value) || 1;
+            const repeatUnit = document.getElementById('repeatUnit').value;
+            const repeatUntil = new Date(document.getElementById('repeatUntil').value);
+            repeatUntil.setHours(23, 59, 59, 999);
+            
+            const selectedDays = Array.from(document.querySelectorAll('.day-btn.active')).map(b => parseInt(b.dataset.day));
+            const dates = [];
+            
+            if (repeatUnit === 'day') {
+                let current = new Date(startTime);
+                while (current <= repeatUntil && dates.length < 100) {
+                    dates.push(new Date(current));
+                    current.setDate(current.getDate() + repeatEvery);
+                }
+            } else { // week
+                if (selectedDays.length === 0) return dates;
+                let weekStart = new Date(startTime);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Go to Sunday
+                
+                while (weekStart <= repeatUntil && dates.length < 100) {
+                    selectedDays.forEach(day => {
+                        const dateForDay = new Date(weekStart);
+                        dateForDay.setDate(weekStart.getDate() + day);
+                        dateForDay.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+                        if (dateForDay >= startTime && dateForDay <= repeatUntil) {
+                            dates.push(new Date(dateForDay));
+                        }
+                    });
+                    weekStart.setDate(weekStart.getDate() + 7 * repeatEvery);
+                }
+                dates.sort((a, b) => a - b);
+            }
+            return dates;
+        }
+        
+        function updateRecurringPreview() {
+            const preview = document.getElementById('recurringPreview');
+            const dates = getRecurringDates();
+            if (dates.length === 0) {
+                preview.innerHTML = '<span style="color:var(--danger);">⚠️ กรุณาเลือกวันที่ต้องการจองซ้ำ</span>';
+                return;
+            }
+            const dayNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+            const firstFew = dates.slice(0, 5).map(d => dayNames[d.getDay()] + ' ' + d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })).join(', ');
+            preview.innerHTML = '📅 จะสร้างการจอง <strong>' + dates.length + ' รายการ</strong><br><small>' + firstFew + (dates.length > 5 ? ' ...' : '') + '</small>';
+        }
         function closeBookingModal() { document.getElementById('bookingModal').classList.remove('active'); }
         
         async function deleteCurrentBooking() {
@@ -487,7 +634,97 @@
             }
         }
         
-        async function saveBooking(event) { event.preventDefault(); const id = document.getElementById('bookingId').value; const roomId = document.getElementById('bookingRoomId').value; const userId = document.getElementById('bookingUser').value; const user = users.find(u => u.id === userId); const room = rooms.find(r => r.id === roomId); const startTime = new Date(document.getElementById('bookingStart').value); const duration = parseInt(document.getElementById('bookingDuration').value); const endTime = addMinutes(startTime, duration); const purpose = document.getElementById('bookingPurpose').value; const hasConflict = bookings.some(b => { if (b.id === id || b.roomId !== roomId) return false; const s = new Date(b.startTime), e = new Date(b.endTime); return (startTime < e && endTime > s); }); if (hasConflict) { alert('❌ ช่วงเวลานี้มีการจองแล้ว'); return; } const booking = { id: id || generateId(), roomId, roomName: room?.name, bookedById: userId, bookedBy: user?.name, startTime: startTime.toISOString(), endTime: endTime.toISOString(), duration, purpose }; const success = await saveBookingToFirebase(booking); if (success) { closeBookingModal(); showSuccessModal(booking, room); } else { alert('❌ ไม่สามารถบันทึกได้ กรุณาลองใหม่'); } }
+        async function saveBooking(event) { 
+            event.preventDefault(); 
+            const id = document.getElementById('bookingId').value; 
+            const roomId = document.getElementById('bookingRoomId').value; 
+            const userId = document.getElementById('bookingUser').value; 
+            const user = users.find(u => u.id === userId); 
+            const room = rooms.find(r => r.id === roomId); 
+            const startTime = new Date(document.getElementById('bookingStart').value); 
+            const duration = parseInt(document.getElementById('bookingDuration').value); 
+            const purpose = document.getElementById('bookingPurpose').value;
+            const isRecurring = document.getElementById('recurringEnabled').checked && !id;
+            
+            if (isRecurring) {
+                // Recurring booking
+                const dates = getRecurringDates();
+                if (dates.length === 0) { alert('❌ กรุณาเลือกวันที่ต้องการจองซ้ำ'); return; }
+                if (dates.length > 50) { 
+                    if (!confirm('⚠️ จะสร้างการจอง ' + dates.length + ' รายการ\nต้องการดำเนินการต่อหรือไม่?')) return; 
+                }
+                
+                // Check conflicts for all dates
+                const conflicts = [];
+                dates.forEach(date => {
+                    const endTime = addMinutes(date, duration);
+                    const hasConflict = bookings.some(b => {
+                        if (b.roomId !== roomId) return false;
+                        const s = new Date(b.startTime), e = new Date(b.endTime);
+                        return (date < e && endTime > s);
+                    });
+                    if (hasConflict) conflicts.push(date);
+                });
+                
+                if (conflicts.length > 0) {
+                    const conflictDates = conflicts.slice(0, 3).map(d => d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })).join(', ');
+                    alert('❌ พบการจองซ้ำซ้อน ' + conflicts.length + ' รายการ:\n' + conflictDates + (conflicts.length > 3 ? ' ...' : '') + '\n\nกรุณาเลือกวัน/เวลาอื่น');
+                    return;
+                }
+                
+                // Create all bookings
+                const recurringGroupId = generateId();
+                let successCount = 0;
+                updateSyncStatus('syncing');
+                
+                for (const date of dates) {
+                    const endTime = addMinutes(date, duration);
+                    const booking = {
+                        id: generateId(),
+                        roomId,
+                        roomName: room?.name,
+                        bookedById: userId,
+                        bookedBy: user?.name,
+                        startTime: date.toISOString(),
+                        endTime: endTime.toISOString(),
+                        duration,
+                        purpose,
+                        recurringGroupId
+                    };
+                    try {
+                        await db.collection('bookings').doc(booking.id).set(booking);
+                        successCount++;
+                    } catch (e) { console.error(e); }
+                }
+                
+                updateSyncStatus('online');
+                closeBookingModal();
+                alert('✅ สร้างการจองซ้ำสำเร็จ ' + successCount + '/' + dates.length + ' รายการ');
+            } else {
+                // Single booking
+                const endTime = addMinutes(startTime, duration);
+                const hasConflict = bookings.some(b => { 
+                    if (b.id === id || b.roomId !== roomId) return false; 
+                    const s = new Date(b.startTime), e = new Date(b.endTime); 
+                    return (startTime < e && endTime > s); 
+                }); 
+                if (hasConflict) { alert('❌ ช่วงเวลานี้มีการจองแล้ว'); return; } 
+                const booking = { 
+                    id: id || generateId(), 
+                    roomId, 
+                    roomName: room?.name, 
+                    bookedById: userId, 
+                    bookedBy: user?.name, 
+                    startTime: startTime.toISOString(), 
+                    endTime: endTime.toISOString(), 
+                    duration, 
+                    purpose 
+                }; 
+                const success = await saveBookingToFirebase(booking); 
+                if (success) { closeBookingModal(); showSuccessModal(booking, room); } 
+                else { alert('❌ ไม่สามารถบันทึกได้ กรุณาลองใหม่'); }
+            }
+        }
         function editBooking(id) { const b = bookings.find(x => x.id === id); if (b && b.bookedById === currentUserId) openBookingModal(b.roomId, id); }
         async function deleteBooking(id) { if (confirm('ต้องการยกเลิกการจองนี้หรือไม่?')) await deleteBookingFromFirebase(id); }
         
@@ -529,7 +766,7 @@
         function openSignage(roomId) { window.open(window.location.pathname + '?display=' + roomId, '_blank'); }
         function renderSignage(roomId) { document.body.classList.add('signage-mode'); document.getElementById('signageDisplay').style.display = 'flex'; const room = rooms.find(r => r.id === roomId); if (!room) { document.getElementById('signageDisplay').innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><h3>ไม่พบห้องที่ระบุ</h3></div>'; return; } function update() { const now = new Date(); const roomB = bookings.filter(b => b.roomId === roomId).sort((a, b) => new Date(a.startTime) - new Date(b.startTime)); const curr = roomB.find(b => { const s = new Date(b.startTime), e = new Date(b.endTime); return now >= s && now < e; }); const upcoming = roomB.filter(b => new Date(b.startTime) > now).slice(0, 5); document.getElementById('signageDisplay').innerHTML = '<div class="signage-header"><div><div class="signage-room-name">' + room.name + '</div><div class="signage-location">📍 ' + room.location + ' | 👥 ' + room.capacity + ' ที่นั่ง</div></div><div class="signage-clock"><div class="signage-time">' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '</div><div class="signage-date">' + formatDate(now) + '</div></div></div><div class="signage-status ' + (curr ? 'occupied' : 'available') + '"><div class="status-label">สถานะปัจจุบัน</div><div class="status-text ' + (curr ? 'occupied' : 'available') + '">' + (curr ? '🔴 ไม่ว่าง' : '🟢 ว่าง') + '</div>' + (curr ? '<div class="current-booking"><div class="current-booking-title">' + (curr.purpose || 'การประชุม') + ' - ' + curr.bookedBy + '</div><div class="current-booking-time">' + formatTime(curr.startTime) + ' - ' + formatTime(curr.endTime) + '</div></div>' : '') + '</div><div class="upcoming-section"><h3>📋 การจองที่กำลังจะมาถึง</h3>' + (upcoming.length === 0 ? '<div class="empty-state" style="padding:2rem;"><p>ไม่มีการจองในขณะนี้</p></div>' : '<div class="upcoming-list">' + upcoming.map(b => '<div class="upcoming-item"><div class="time">' + formatTime(b.startTime) + ' - ' + formatTime(b.endTime) + '</div><div class="title">' + (b.purpose || 'การประชุม') + '</div><div class="booker">' + b.bookedBy + '</div></div>').join('') + '</div>') + '</div>'; } update(); setInterval(update, 1000); }
         
-        async function init() { const urlParams = new URLSearchParams(window.location.search); const displayRoom = urlParams.get('display'); await initializeData(); setupRealtimeListeners(); if (displayRoom) { renderSignage(displayRoom); } else { renderUserSelect(); setupTabs(); renderAll(); } }
+        async function init() { const urlParams = new URLSearchParams(window.location.search); const displayRoom = urlParams.get('display'); await initializeData(); setupRealtimeListeners(); if (displayRoom) { renderSignage(displayRoom); } else { renderUserSelect(); setupTabs(); setupRecurringHandlers(); renderAll(); } }
         init();
     </script>
 </body>
